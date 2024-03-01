@@ -24,6 +24,7 @@ class _UploadImagePageState extends State<UploadImagePage> {
   int _totalSize = 0;
   String error = "";
   bool isHavingHandwrittenDigits = false;
+  bool isLocalHost = false;
 
   @override
   void initState() {
@@ -48,7 +49,14 @@ class _UploadImagePageState extends State<UploadImagePage> {
       // var url =
       //     'https://puzzlepro-backend-release-0-1.onrender.com/generate-sudoku-matrix';
       // var url = "http://10.0.2.2:8000/generate-sudoku-matrix";
-      var url = 'https://puzzlepro.azurewebsites.net/${isHavingHandwrittenDigits ? "generate-sudoku-matrix-for-mixed" : "generate-sudoku-matrix"}';
+      String url;
+      if (isLocalHost) {
+        url =
+            'http://10.0.2.2:8000/${isHavingHandwrittenDigits ? "generate-sudoku-matrix-for-mixed" : "generate-sudoku-matrix"}';
+      } else {
+        url =
+            'https://puzzlepro.azurewebsites.net/${isHavingHandwrittenDigits ? "generate-sudoku-matrix-for-mixed" : "generate-sudoku-matrix"}';
+      }
       String imageBase64 = base64Encode(widget.image);
       var jsonBody = {"base64_image": "data:image/jpg;base64,$imageBase64"};
       var body = json.encode(jsonBody);
@@ -164,7 +172,20 @@ class _UploadImagePageState extends State<UploadImagePage> {
                   isHavingHandwrittenDigits = newValue!;
                 });
               },
-              controlAffinity: ListTileControlAffinity.leading,  //  <-- leading Checkbox
+              controlAffinity:
+                  ListTileControlAffinity.leading, //  <-- leading Checkbox
+            ),
+            const SizedBox(height: 20),
+            CheckboxListTile(
+              title: const Text("Use local host."),
+              value: isLocalHost,
+              onChanged: (newValue) {
+                setState(() {
+                  isLocalHost = newValue!;
+                });
+              },
+              controlAffinity:
+                  ListTileControlAffinity.leading, //  <-- leading Checkbox
             ),
             const SizedBox(height: 20),
             ElevatedButton(

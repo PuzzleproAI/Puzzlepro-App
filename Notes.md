@@ -4,7 +4,7 @@
 1. ~~Sudoku check answer page and functionality. => Done~~
 2. Settings page. => Ayush currently working
 3. ~~Sudoku validation page and functionality => Dhrumil Done~~
-4. Share and export sudoku functionality 
+4. Share and export sudoku functionality => currently working
 5. Handwritten sudoku validation and scan. 
 6. Transitions 
 7. Animations

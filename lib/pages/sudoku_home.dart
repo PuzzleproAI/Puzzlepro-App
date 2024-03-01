@@ -136,7 +136,8 @@ class _SudokuHomeState extends State<SudokuHome> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (BuildContext context) {
                       return SudokuAnswerChecker(
                         sudoku: sudoku,
                       );
@@ -144,8 +145,7 @@ class _SudokuHomeState extends State<SudokuHome> {
                   },
                   child: Text(
                     "Check Answer",
-                    style: TextStyle(
-                        color: _colorScheme.primary),
+                    style: TextStyle(color: _colorScheme.primary),
                   ),
                 ),
               ],
@@ -228,7 +228,8 @@ class _SudokuHomeState extends State<SudokuHome> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (BuildContext context) {
                         return SudokuValidator(
                           sudoku: sudoku,
                         );
