@@ -124,11 +124,9 @@ class _SudokuAnswerState extends State<SudokuAnswer> {
       body: Center(
           child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          const SizedBox(height: 10.0),
-          ElevatedButton(onPressed: generateAnswer, child: Text(buttonText)),
-          const SizedBox(height: 30.0),
+          const SizedBox(height: 100.0),
           SizedBox(
             width: 350.0,
             height: 350.0,
@@ -154,6 +152,18 @@ class _SudokuAnswerState extends State<SudokuAnswer> {
               ),
             ),
           ),
+          const SizedBox(height: 30.0),
+          SizedBox(
+            width: 400,
+            height: 70,
+            child: ElevatedButton(
+              onPressed: generateAnswer,
+              child: Text(
+                buttonText,
+                style: const TextStyle(fontSize: 30.0),
+              ),
+            ),
+          )
         ],
       )),
     );

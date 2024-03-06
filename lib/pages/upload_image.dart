@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:core';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:puzzlepro_app/Widgets/sudoku_board_widget.dart';
 import 'package:puzzlepro_app/models/sudoku.dart';
 import 'package:puzzlepro_app/pages/sudoku_home.dart';
 import 'package:puzzlepro_app/services/database.dart';
@@ -25,6 +26,8 @@ class _UploadImagePageState extends State<UploadImagePage> {
   String error = "";
   bool isHavingHandwrittenDigits = false;
   bool isLocalHost = false;
+  Sudoku? generatedSudoku;
+  late final ColorScheme _colorScheme = Theme.of(context).colorScheme;
 
   @override
   void initState() {
@@ -104,12 +107,9 @@ class _UploadImagePageState extends State<UploadImagePage> {
               .toList();
           if (!context.mounted) return;
           Sudoku sudoku = Sudoku(matrix, true, "NA");
-          StorageHelper.saveSudoku(sudoku).then((value) => Navigator.push(
-                  context, MaterialPageRoute(builder: (BuildContext context) {
-                return SudokuHome(
-                  index: value,
-                );
-              })));
+          setState(() {
+            generatedSudoku = sudoku;
+          });
         });
       } else {
         setState(() {
@@ -126,6 +126,67 @@ class _UploadImagePageState extends State<UploadImagePage> {
       });
     }
   }
+  Widget _menu() {
+    return Expanded(
+      child: Center(
+        child: Column(
+          children: [
+            const Padding(
+              padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 10.0),
+              child: Text(
+                'Generated sudoku',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 27,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 20.0,
+            ),
+            SudokuBoardWidget(
+                sudoku: generatedSudoku!, colorScheme: _colorScheme),
+            const SizedBox(
+              height: 20.0,
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(Icons.restart_alt_rounded),
+                  label: const Text("Try Again"),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 32.0),
+                  child: ElevatedButton.icon(
+                    onPressed: saveButton,
+                    icon: const Icon(Icons.check_rounded),
+                    label: const Text("Save and start"),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  sendToHome(int id) {
+    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
+      return SudokuHome(
+        index: id,
+      );
+    }));
+  }
+
+  saveButton() async {
+    int id = await StorageHelper.saveSudoku(generatedSudoku!);
+    sendToHome(id);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -139,7 +200,7 @@ class _UploadImagePageState extends State<UploadImagePage> {
           ),
         ),
       ),
-      body: Center(
+      body: generatedSudoku == null ? Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -173,7 +234,7 @@ class _UploadImagePageState extends State<UploadImagePage> {
                 });
               },
               controlAffinity:
-                  ListTileControlAffinity.leading, //  <-- leading Checkbox
+                  ListTileControlAffinity.leading,
             ),
             const SizedBox(height: 20),
             CheckboxListTile(
@@ -185,7 +246,7 @@ class _UploadImagePageState extends State<UploadImagePage> {
                 });
               },
               controlAffinity:
-                  ListTileControlAffinity.leading, //  <-- leading Checkbox
+                  ListTileControlAffinity.leading,
             ),
             const SizedBox(height: 20),
             ElevatedButton(
@@ -203,7 +264,7 @@ class _UploadImagePageState extends State<UploadImagePage> {
               ),
           ],
         ),
-      ),
+      ) : _menu(),
     );
   }
 }

@@ -290,7 +290,7 @@ class SudokuCellWithFinal extends StatelessWidget {
         return colorScheme.error.withOpacity(0.1);
       }
     } else if (stateOfBoard == 2) {
-      if (finalAnswer != addedDigitsValue) {
+      if (finalAnswer != addedDigitsValue && addedDigitsValue != 0) {
         return Colors.green.withOpacity(0.1);
       }
     } else if (stateOfBoard == 3) {
