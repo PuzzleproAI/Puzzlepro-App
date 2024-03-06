@@ -18,6 +18,9 @@ dependencies:
   sudoku_dart: ^1.1.0
   image_gallery_saver: ^2.0.3
   pdf: ^3.10.8
+  widgets_to_image: ^0.0.2
+  share: ^2.0.4
+  path_provider: ^2.1.2
 
 dev_dependencies:
   hive_generator: ^2.0.1
