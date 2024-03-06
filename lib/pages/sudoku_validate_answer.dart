@@ -119,7 +119,7 @@ class _SudokuValidatorState extends State<SudokuValidator> {
       }
 
       for (int j = 0; j < list1[i].length; j++) {
-        if (list1[i][j] != list2[i][j] && list1[i][j] != 0) {
+        if (list1[i][j] != list2[i][j] && list2[i][j] != 0) {
           return false;
         }
       }
@@ -134,11 +134,11 @@ class _SudokuValidatorState extends State<SudokuValidator> {
     }
     if (isEqual(widget.sudoku.finalAnswer!, widget.sudoku.addedDigits!)) {
       setState(() {
-        status = "Correctly filled";
+        status = "Correctly filled till now.. 😀";
       });
     } else {
       setState(() {
-        status = "Wrong filled";
+        status = "Opps! Wrong filled 😅";
       });
     }
   }
