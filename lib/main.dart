@@ -31,8 +31,7 @@ class _AppState extends State<App> {
   ThemeMode themeMode = ThemeMode.dark;
   ColorSeed colorSelected = ColorSeed.teal;
   ColorScheme? colorScheme = const ColorScheme.highContrastDark();
-
-
+  
   bool useLightMode(int theme) {
     switch (theme) {
       case 0:
@@ -45,7 +44,7 @@ class _AppState extends State<App> {
         setState(() {
           themeMode = ThemeMode.light;
         });
-        return true;  
+        return true;
       case 2:
         setState(() {
           themeMode = ThemeMode.dark;
@@ -98,7 +97,6 @@ class _AppState extends State<App> {
     switch (screenSelected) {
       case ScreenSelected.home:
         return Home(
-
           useMaterial3: useMaterial3,
           handleBrightnessChange: handleBrightnessChange,
           handleColorSelect: handleColorSelect,
@@ -110,7 +108,9 @@ class _AppState extends State<App> {
           handleScreenChange: handleScreenChange,
         );
       case ScreenSelected.setting:
-        return SettingsPage(changeTheme: useLightMode,);
+        return SettingsPage(
+          changeTheme: useLightMode,
+        );
       //   return const SettingsPage();
     }
   }

@@ -1,6 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:puzzlepro_app/pages/sudoku_answer.dart';
 import 'package:puzzlepro_app/pages/sudoku_check_answer.dart';
+import 'package:puzzlepro_app/pages/sudoku_validate_answer.dart';
+import 'package:share/share.dart';
+import 'package:widgets_to_image/widgets_to_image.dart';
 import '../models/sudoku.dart';
 import '../services/database.dart';
 
@@ -18,6 +24,7 @@ class _SudokuHomeState extends State<SudokuHome> {
   final List<int> currentSelectedCell = [10, 10];
   int isLoading = 0;
   Sudoku sudoku = Sudoku.empty();
+  WidgetsToImageController controller = WidgetsToImageController();
 
   @override
   void initState() {
@@ -85,6 +92,63 @@ class _SudokuHomeState extends State<SudokuHome> {
     showSnackBar();
   }
 
+  void shareSudokuAsImage() async {
+    final tempDir = await getTemporaryDirectory();
+    final imageBytes = await controller.capture();
+
+    await File('${tempDir.path}/SudokuImage.png')
+        .writeAsBytes(imageBytes!.toList());
+
+    await Share.shareFiles(['${tempDir.path}/SudokuImage.png'],
+        text: 'SudokuImage');
+  }
+
+  void goToHome() {
+    Navigator.pop(context);
+  }
+
+  void deleteAndPop() async {
+    await StorageHelper.deleteSudokuById(widget.index);
+    goToHome();
+  }
+
+  Widget sudokuWidget() {
+    return SizedBox(
+      width: 350.0,
+      height: 350.0,
+      child: CustomPaint(
+        painter: LinesPainter(_colorScheme),
+        child: GridView.builder(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 9,
+          ),
+          itemCount:
+              sudoku.originalSudoku.length * sudoku.originalSudoku[0].length,
+          itemBuilder: (context, index) {
+            int row = index ~/ 9;
+            int col = index % 9;
+            int originalCellValue = sudoku.originalSudoku[row][col];
+            int addedDigitsCellValue = sudoku.addedDigits![row][col];
+
+            return SudokuCell(
+              originalValue: originalCellValue,
+              addedDigitsValue: addedDigitsCellValue,
+              colorScheme: _colorScheme,
+              isSelected: (currentSelectedCell[0] == row &&
+                  currentSelectedCell[1] == col),
+              onTap: () {
+                setState(() {
+                  currentSelectedCell[0] = row;
+                  currentSelectedCell[1] = col;
+                });
+              },
+            );
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -100,7 +164,10 @@ class _SudokuHomeState extends State<SudokuHome> {
           PopupMenuButton<String>(
             onSelected: (value) {
               if (value == "share") {
-              } else if (value == "delete") {}
+                shareSudokuAsImage();
+              } else if (value == "delete") {
+                deleteAndPop();
+              }
             },
             itemBuilder: (BuildContext context) {
               return [
@@ -135,7 +202,8 @@ class _SudokuHomeState extends State<SudokuHome> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (BuildContext context) {
                       return SudokuAnswerChecker(
                         sudoku: sudoku,
                       );
@@ -143,47 +211,16 @@ class _SudokuHomeState extends State<SudokuHome> {
                   },
                   child: Text(
                     "Check Answer",
-                    style: TextStyle(
-                        color: _colorScheme.primary),
+                    style: TextStyle(color: _colorScheme.primary),
                   ),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 10.0),
-          SizedBox(
-            width: 350.0,
-            height: 350.0,
-            child: CustomPaint(
-              painter: LinesPainter(_colorScheme),
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 9,
-                ),
-                itemCount: sudoku.originalSudoku.length *
-                    sudoku.originalSudoku[0].length,
-                itemBuilder: (context, index) {
-                  int row = index ~/ 9;
-                  int col = index % 9;
-                  int originalCellValue = sudoku.originalSudoku[row][col];
-                  int addedDigitsCellValue = sudoku.addedDigits![row][col];
-
-                  return SudokuCell(
-                    originalValue: originalCellValue,
-                    addedDigitsValue: addedDigitsCellValue,
-                    colorScheme: _colorScheme,
-                    isSelected: (currentSelectedCell[0] == row &&
-                        currentSelectedCell[1] == col),
-                    onTap: () {
-                      setState(() {
-                        currentSelectedCell[0] = row;
-                        currentSelectedCell[1] = col;
-                      });
-                    },
-                  );
-                },
-              ),
-            ),
+          WidgetsToImage(
+            controller: controller,
+            child: sudokuWidget(),
           ),
           const SizedBox(
             height: 20.0,
@@ -227,7 +264,12 @@ class _SudokuHomeState extends State<SudokuHome> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      // Handle validate sudoku button
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (BuildContext context) {
+                        return SudokuValidator(
+                          sudoku: sudoku,
+                        );
+                      }));
                     },
                     child: const Icon(Icons.lightbulb_outline_rounded),
                   ),

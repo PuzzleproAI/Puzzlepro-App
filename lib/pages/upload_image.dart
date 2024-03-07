@@ -4,7 +4,9 @@ import 'dart:io';
 import 'dart:core';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:puzzlepro_app/Widgets/sudoku_board_widget.dart';
 import 'package:puzzlepro_app/models/sudoku.dart';
+import 'package:puzzlepro_app/pages/sudoku_answer.dart';
 import 'package:puzzlepro_app/pages/sudoku_home.dart';
 import 'package:puzzlepro_app/services/database.dart';
 
@@ -24,6 +26,9 @@ class _UploadImagePageState extends State<UploadImagePage> {
   int _totalSize = 0;
   String error = "";
   bool isHavingHandwrittenDigits = false;
+  bool isLocalHost = false;
+  Sudoku? generatedSudoku;
+  late final ColorScheme _colorScheme = Theme.of(context).colorScheme;
 
   @override
   void initState() {
@@ -48,7 +53,14 @@ class _UploadImagePageState extends State<UploadImagePage> {
       // var url =
       //     'https://puzzlepro-backend-release-0-1.onrender.com/generate-sudoku-matrix';
       // var url = "http://10.0.2.2:8000/generate-sudoku-matrix";
-      var url = 'https://puzzlepro.azurewebsites.net/${isHavingHandwrittenDigits ? "generate-sudoku-matrix-for-mixed" : "generate-sudoku-matrix"}';
+      String url;
+      if (isLocalHost) {
+        url =
+            'http://10.0.2.2:8000/${isHavingHandwrittenDigits ? "generate-sudoku-matrix-for-mixed" : "generate-sudoku-matrix"}';
+      } else {
+        url =
+            'https://puzzlepro.azurewebsites.net/${isHavingHandwrittenDigits ? "generate-sudoku-matrix-for-mixed" : "generate-sudoku-matrix"}';
+      }
       String imageBase64 = base64Encode(widget.image);
       var jsonBody = {"base64_image": "data:image/jpg;base64,$imageBase64"};
       var body = json.encode(jsonBody);
@@ -95,13 +107,10 @@ class _UploadImagePageState extends State<UploadImagePage> {
               .map((row) => List<int>.from(row))
               .toList();
           if (!context.mounted) return;
-          Sudoku sudoku = Sudoku(matrix, true, "Normal");
-          StorageHelper.saveSudoku(sudoku).then((value) => Navigator.push(
-                  context, MaterialPageRoute(builder: (BuildContext context) {
-                return SudokuHome(
-                  index: value,
-                );
-              })));
+          Sudoku sudoku = Sudoku(matrix, true, "NA");
+          setState(() {
+            generatedSudoku = sudoku;
+          });
         });
       } else {
         setState(() {
@@ -119,6 +128,85 @@ class _UploadImagePageState extends State<UploadImagePage> {
     }
   }
 
+  Widget _menu() {
+    return Expanded(
+      child: Center(
+        child: Column(
+          children: [
+            const Padding(
+              padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 10.0),
+              child: Text(
+                'Generated sudoku',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 27,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 20.0,
+            ),
+            SudokuBoardWidget(
+                sudoku: generatedSudoku!, colorScheme: _colorScheme),
+            const SizedBox(
+              height: 20.0,
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(Icons.restart_alt_rounded),
+                  label: const Text("Try Again"),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 32.0),
+                  child: ElevatedButton.icon(
+                    onPressed: saveButton,
+                    icon: const Icon(Icons.check_rounded),
+                    label: const Text("Save and start"),
+                  ),
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 32.0),
+              child: ElevatedButton.icon(
+                onPressed: validateSudokuButton,
+                icon: const Icon(Icons.lightbulb_outline_rounded),
+                label: const Text("Validate sudoku"),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  validateSudokuButton() {
+    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
+      return SudokuAnswer(
+        sudoku: generatedSudoku!,
+      );
+    }));
+  }
+
+  sendToHome(int id) {
+    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
+      return SudokuHome(
+        index: id,
+      );
+    }));
+  }
+
+  saveButton() async {
+    int id = await StorageHelper.saveSudoku(generatedSudoku!);
+    sendToHome(id);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -131,58 +219,74 @@ class _UploadImagePageState extends State<UploadImagePage> {
           ),
         ),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const SizedBox(height: 10),
-            LinearProgressIndicator(
-              value: _uploadProgress / 100,
-              minHeight: 20,
-              backgroundColor: Colors.grey[300],
-              valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              '$_uploadProgress% Uploaded',
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Uploaded Size: ${(_uploadedSize / (1024 * 1024)).toStringAsFixed(2)} MB',
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Total Size: ${(_totalSize / (1024 * 1024)).toStringAsFixed(2)} MB',
-            ),
-            const SizedBox(height: 20),
-            CheckboxListTile(
-              title: const Text("My image contains handwritten digits."),
-              value: isHavingHandwrittenDigits,
-              onChanged: (newValue) {
-                setState(() {
-                  isHavingHandwrittenDigits = newValue!;
-                });
-              },
-              controlAffinity: ListTileControlAffinity.leading,  //  <-- leading Checkbox
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _isUploading ? null : _uploadImage,
-              child: _isUploading
-                  ? const SizedBox(
-                      width: 20, height: 20, child: CircularProgressIndicator())
-                  : const Text('Upload Image'),
-            ),
-            const SizedBox(height: 20),
-            if (_uploadProgress == 100)
-              const Text(
-                'Recognising image',
-                style: TextStyle(fontWeight: FontWeight.bold),
+      body: generatedSudoku == null
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 10),
+                  LinearProgressIndicator(
+                    value: _uploadProgress / 100,
+                    minHeight: 20,
+                    backgroundColor: Colors.grey[300],
+                    valueColor:
+                        const AlwaysStoppedAnimation<Color>(Colors.blue),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    '$_uploadProgress% Uploaded',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Uploaded Size: ${(_uploadedSize / (1024 * 1024)).toStringAsFixed(2)} MB',
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Total Size: ${(_totalSize / (1024 * 1024)).toStringAsFixed(2)} MB',
+                  ),
+                  const SizedBox(height: 20),
+                  CheckboxListTile(
+                    title: const Text("My image contains handwritten digits."),
+                    value: isHavingHandwrittenDigits,
+                    onChanged: (newValue) {
+                      setState(() {
+                        isHavingHandwrittenDigits = newValue!;
+                      });
+                    },
+                    controlAffinity: ListTileControlAffinity.leading,
+                  ),
+                  const SizedBox(height: 20),
+                  CheckboxListTile(
+                    title: const Text("Use local host."),
+                    value: isLocalHost,
+                    onChanged: (newValue) {
+                      setState(() {
+                        isLocalHost = newValue!;
+                      });
+                    },
+                    controlAffinity: ListTileControlAffinity.leading,
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _isUploading ? null : _uploadImage,
+                    child: _isUploading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator())
+                        : const Text('Upload Image'),
+                  ),
+                  const SizedBox(height: 20),
+                  if (_uploadProgress == 100)
+                    const Text(
+                      'Recognising image',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                ],
               ),
-          ],
-        ),
-      ),
+            )
+          : _menu(),
     );
   }
 }

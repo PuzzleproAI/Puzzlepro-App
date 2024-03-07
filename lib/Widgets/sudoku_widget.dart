@@ -253,31 +253,34 @@ class _SudokuHeadlineState extends State<SudokuHeadline> {
                         const SizedBox(
                           width: 10,
                         ),
-                        if (widget.sudoku.difficulty != "NA")
-                          Container(
-                            padding: const EdgeInsets.fromLTRB(4,3,4,3),
-                            decoration: BoxDecoration(
-                              color: _getLowPitchColorForDifficulty(
-                                  widget.sudoku.difficulty),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color: _getHighPitchColorForDifficulty(
-                                    widget.sudoku.difficulty),
-                                width: 2,
+                        widget.sudoku.difficulty != "NA"
+                            ? Container(
+                                padding: const EdgeInsets.fromLTRB(4, 3, 4, 3),
+                                decoration: BoxDecoration(
+                                  color: _getLowPitchColorForDifficulty(
+                                      widget.sudoku.difficulty),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: _getHighPitchColorForDifficulty(
+                                        widget.sudoku.difficulty),
+                                    width: 2,
+                                  ),
+                                ),
+                                child: Text(
+                                  widget.sudoku.difficulty.toUpperCase(),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.fade,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: _getHighPitchColorForDifficulty(
+                                        widget.sudoku.difficulty),
+                                  ),
+                                ),
+                              )
+                            : const SizedBox(
+                                width: 10,
                               ),
-                            ),
-                            child: Text(
-                              widget.sudoku.difficulty.toUpperCase(),
-                              maxLines: 1,
-                              overflow: TextOverflow.fade,
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: _getHighPitchColorForDifficulty(
-                                    widget.sudoku.difficulty),
-                              ),
-                            ),
-                          ),
                       ],
                     )
                   ],

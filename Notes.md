@@ -3,20 +3,19 @@
 
 1. ~~Sudoku check answer page and functionality. => Done~~
 2. Settings page. => Ayush currently working
-3. Sudoku validation page and functionality => Dhrumil currently working
-4. Share and export sudoku functionality 
-5. Handwritten sudoku validation and scan. 
+3. ~~Sudoku validation page and functionality => Dhrumil Done~~
+4. ~~Share and export sudoku functionality => Done~~
+5. Handwritten sudoku validation and scan. => working rn.
 6. Transitions 
 7. Animations
 
 #### small things should be changed
 
 1. Check network and server status before upload image
-2. Verify before saving scanned image sudoku like generator page
+2. ~~Verify before saving scanned image sudoku like generator page => Done~~
 
 #### optional things
 
-1. Responsive navigation bar
-2. Offline scan
+1. Offline scan
 
 ### Testing is remaining

@@ -15,6 +15,17 @@ class StorageHelper {
     sudokuBox = await Hive.openBox<Sudoku>(sudokuBoxName);
   }
 
+  static bool checkCompleted(Sudoku sudoku) {
+    for (int i = 0; i < 9; i++) {
+      for (int j = 0; j < 9; j++) {
+        if (sudoku.addedDigits![i][j] == 0) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
   static Future<int> saveSudoku(Sudoku sudoku) async {
     if (sudokuBox == null) {
       initializeHive();
@@ -31,6 +42,9 @@ class StorageHelper {
       initializeHive();
     }
     if (sudokuBox!.isOpen == true) {
+      if (checkCompleted(sudoku)) {
+        sudoku.isComplete = true;
+      }
       final box = await Hive.openBox<Sudoku>(sudokuBoxName);
       await box.put(index, sudoku);
     }

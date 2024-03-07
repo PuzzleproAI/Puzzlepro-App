@@ -107,7 +107,7 @@ class _SudokuListViewState extends State<SudokuListView> {
                                     return SudokuHome(
                                       index: key,
                                     );
-                                  }))
+                                  })).then((value) => {widget.onRefresh()})
                                 },
                                 key: widget.key,
                                 onDelete: () => {
