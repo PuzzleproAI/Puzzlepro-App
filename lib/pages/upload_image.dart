@@ -6,6 +6,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:puzzlepro_app/Widgets/sudoku_board_widget.dart';
 import 'package:puzzlepro_app/models/sudoku.dart';
+import 'package:puzzlepro_app/pages/sudoku_answer.dart';
 import 'package:puzzlepro_app/pages/sudoku_home.dart';
 import 'package:puzzlepro_app/services/database.dart';
 
@@ -126,6 +127,7 @@ class _UploadImagePageState extends State<UploadImagePage> {
       });
     }
   }
+
   Widget _menu() {
     return Expanded(
       child: Center(
@@ -173,7 +175,7 @@ class _UploadImagePageState extends State<UploadImagePage> {
             Padding(
               padding: const EdgeInsets.only(left: 32.0),
               child: ElevatedButton.icon(
-                onPressed: saveButton,
+                onPressed: validateSudokuButton,
                 icon: const Icon(Icons.lightbulb_outline_rounded),
                 label: const Text("Validate sudoku"),
               ),
@@ -183,6 +185,15 @@ class _UploadImagePageState extends State<UploadImagePage> {
       ),
     );
   }
+
+  validateSudokuButton() {
+    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
+      return SudokuAnswer(
+        sudoku: generatedSudoku!,
+      );
+    }));
+  }
+
   sendToHome(int id) {
     Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
       return SudokuHome(
@@ -208,71 +219,74 @@ class _UploadImagePageState extends State<UploadImagePage> {
           ),
         ),
       ),
-      body: generatedSudoku == null ? Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const SizedBox(height: 10),
-            LinearProgressIndicator(
-              value: _uploadProgress / 100,
-              minHeight: 20,
-              backgroundColor: Colors.grey[300],
-              valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              '$_uploadProgress% Uploaded',
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Uploaded Size: ${(_uploadedSize / (1024 * 1024)).toStringAsFixed(2)} MB',
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Total Size: ${(_totalSize / (1024 * 1024)).toStringAsFixed(2)} MB',
-            ),
-            const SizedBox(height: 20),
-            CheckboxListTile(
-              title: const Text("My image contains handwritten digits."),
-              value: isHavingHandwrittenDigits,
-              onChanged: (newValue) {
-                setState(() {
-                  isHavingHandwrittenDigits = newValue!;
-                });
-              },
-              controlAffinity:
-                  ListTileControlAffinity.leading,
-            ),
-            const SizedBox(height: 20),
-            CheckboxListTile(
-              title: const Text("Use local host."),
-              value: isLocalHost,
-              onChanged: (newValue) {
-                setState(() {
-                  isLocalHost = newValue!;
-                });
-              },
-              controlAffinity:
-                  ListTileControlAffinity.leading,
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _isUploading ? null : _uploadImage,
-              child: _isUploading
-                  ? const SizedBox(
-                      width: 20, height: 20, child: CircularProgressIndicator())
-                  : const Text('Upload Image'),
-            ),
-            const SizedBox(height: 20),
-            if (_uploadProgress == 100)
-              const Text(
-                'Recognising image',
-                style: TextStyle(fontWeight: FontWeight.bold),
+      body: generatedSudoku == null
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 10),
+                  LinearProgressIndicator(
+                    value: _uploadProgress / 100,
+                    minHeight: 20,
+                    backgroundColor: Colors.grey[300],
+                    valueColor:
+                        const AlwaysStoppedAnimation<Color>(Colors.blue),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    '$_uploadProgress% Uploaded',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Uploaded Size: ${(_uploadedSize / (1024 * 1024)).toStringAsFixed(2)} MB',
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Total Size: ${(_totalSize / (1024 * 1024)).toStringAsFixed(2)} MB',
+                  ),
+                  const SizedBox(height: 20),
+                  CheckboxListTile(
+                    title: const Text("My image contains handwritten digits."),
+                    value: isHavingHandwrittenDigits,
+                    onChanged: (newValue) {
+                      setState(() {
+                        isHavingHandwrittenDigits = newValue!;
+                      });
+                    },
+                    controlAffinity: ListTileControlAffinity.leading,
+                  ),
+                  const SizedBox(height: 20),
+                  CheckboxListTile(
+                    title: const Text("Use local host."),
+                    value: isLocalHost,
+                    onChanged: (newValue) {
+                      setState(() {
+                        isLocalHost = newValue!;
+                      });
+                    },
+                    controlAffinity: ListTileControlAffinity.leading,
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _isUploading ? null : _uploadImage,
+                    child: _isUploading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator())
+                        : const Text('Upload Image'),
+                  ),
+                  const SizedBox(height: 20),
+                  if (_uploadProgress == 100)
+                    const Text(
+                      'Recognising image',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                ],
               ),
-          ],
-        ),
-      ) : _menu(),
+            )
+          : _menu(),
     );
   }
 }
