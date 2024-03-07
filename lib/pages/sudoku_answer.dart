@@ -93,10 +93,10 @@ class _SudokuAnswerState extends State<SudokuAnswer> {
   bool isValidSudoku(List<List<int>> values) {
     for (int i = 0; i < 9; i++) {
       for (int j = 0; j < 9; j++) {
-        if (originalSudoku[i][j] != 0) {
-          var tempSudoku = List.generate(9, (i) => List.generate(9, (j) => originalSudoku[i][j]));
+        if (values[i][j] != 0) {
+          var tempSudoku = List.generate(9, (i) => List.generate(9, (j) => values[i][j]));
           tempSudoku[i][j] = 0;
-          if (!isValid(i, j, originalSudoku[i][j], tempSudoku)) {
+          if (!isValid(i, j, values[i][j], tempSudoku)) {
             return false;
           }
         }

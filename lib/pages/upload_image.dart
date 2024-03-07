@@ -210,83 +210,87 @@ class _UploadImagePageState extends State<UploadImagePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "Upload Image",
-          style: TextStyle(
-            fontWeight: FontWeight.w700,
-            fontSize: 27.0,
+        appBar: AppBar(
+          title: const Text(
+            "Upload Image",
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+              fontSize: 27.0,
+            ),
           ),
         ),
-      ),
-      body: generatedSudoku == null
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 10),
-                  LinearProgressIndicator(
-                    value: _uploadProgress / 100,
-                    minHeight: 20,
-                    backgroundColor: Colors.grey[300],
-                    valueColor:
-                        const AlwaysStoppedAnimation<Color>(Colors.blue),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    '$_uploadProgress% Uploaded',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    'Uploaded Size: ${(_uploadedSize / (1024 * 1024)).toStringAsFixed(2)} MB',
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    'Total Size: ${(_totalSize / (1024 * 1024)).toStringAsFixed(2)} MB',
-                  ),
-                  const SizedBox(height: 20),
-                  CheckboxListTile(
-                    title: const Text("My image contains handwritten digits."),
-                    value: isHavingHandwrittenDigits,
-                    onChanged: (newValue) {
-                      setState(() {
-                        isHavingHandwrittenDigits = newValue!;
-                      });
-                    },
-                    controlAffinity: ListTileControlAffinity.leading,
-                  ),
-                  const SizedBox(height: 20),
-                  CheckboxListTile(
-                    title: const Text("Use local host."),
-                    value: isLocalHost,
-                    onChanged: (newValue) {
-                      setState(() {
-                        isLocalHost = newValue!;
-                      });
-                    },
-                    controlAffinity: ListTileControlAffinity.leading,
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: _isUploading ? null : _uploadImage,
-                    child: _isUploading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator())
-                        : const Text('Upload Image'),
-                  ),
-                  const SizedBox(height: 20),
-                  if (_uploadProgress == 100)
-                    const Text(
-                      'Recognising image',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+        body: Column(
+          children: [
+            generatedSudoku == null
+                ? Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 10),
+                        LinearProgressIndicator(
+                          value: _uploadProgress / 100,
+                          minHeight: 20,
+                          backgroundColor: Colors.grey[300],
+                          valueColor:
+                              const AlwaysStoppedAnimation<Color>(Colors.blue),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          '$_uploadProgress% Uploaded',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          'Uploaded Size: ${(_uploadedSize / (1024 * 1024)).toStringAsFixed(2)} MB',
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          'Total Size: ${(_totalSize / (1024 * 1024)).toStringAsFixed(2)} MB',
+                        ),
+                        const SizedBox(height: 20),
+                        CheckboxListTile(
+                          title: const Text(
+                              "My image contains handwritten digits."),
+                          value: isHavingHandwrittenDigits,
+                          onChanged: (newValue) {
+                            setState(() {
+                              isHavingHandwrittenDigits = newValue!;
+                            });
+                          },
+                          controlAffinity: ListTileControlAffinity.leading,
+                        ),
+                        const SizedBox(height: 20),
+                        CheckboxListTile(
+                          title: const Text("Use local host."),
+                          value: isLocalHost,
+                          onChanged: (newValue) {
+                            setState(() {
+                              isLocalHost = newValue!;
+                            });
+                          },
+                          controlAffinity: ListTileControlAffinity.leading,
+                        ),
+                        const SizedBox(height: 20),
+                        ElevatedButton(
+                          onPressed: _isUploading ? null : _uploadImage,
+                          child: _isUploading
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator())
+                              : const Text('Upload Image'),
+                        ),
+                        const SizedBox(height: 20),
+                        if (_uploadProgress == 100)
+                          const Text(
+                            'Recognising image',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                      ],
                     ),
-                ],
-              ),
-            )
-          : _menu(),
-    );
+                  )
+                : _menu(),
+          ],
+        ));
   }
 }
