@@ -32,14 +32,6 @@ class _AppState extends State<App> {
   ColorSeed colorSelected = ColorSeed.teal;
   ColorScheme? colorScheme = const ColorScheme.highContrastDark();
 
-  void handleDeleteAllData() {
-    StorageHelper.DeleteAllData();
-    setState(() {
-      screenIndex = ScreenSelected.home.value;
-      title = "PuzzlePro";
-    });
-  }
-
 
   bool useLightMode(int theme) {
     switch (theme) {
