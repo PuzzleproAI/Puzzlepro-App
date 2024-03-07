@@ -5,6 +5,7 @@ import 'package:puzzlepro_app/pages/scan_sudoku.dart';
 import 'package:puzzlepro_app/pages/generate_sudoku.dart';
 import 'package:puzzlepro_app/services/database.dart';
 import 'package:puzzlepro_app/pages/settings.dart';
+import 'package:puzzlepro_app/services/database.dart';
 
 void main() async {
   await StorageHelper.initializeHive();
@@ -30,7 +31,7 @@ class _AppState extends State<App> {
   ThemeMode themeMode = ThemeMode.dark;
   ColorSeed colorSelected = ColorSeed.teal;
   ColorScheme? colorScheme = const ColorScheme.highContrastDark();
-
+  
   bool useLightMode(int theme) {
     switch (theme) {
       case 0:
