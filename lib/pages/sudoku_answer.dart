@@ -23,6 +23,7 @@ class _SudokuAnswerState extends State<SudokuAnswer> {
   late final ColorScheme _colorScheme = Theme.of(context).colorScheme;
   final List<int> currentSelectedCell = [10, 10];
   String buttonText = "Solve Now";
+  String labelText = "";
 
   List<List<int>> originalSudoku =
       List.generate(9, (row) => List.generate(9, (col) => 0));
@@ -42,27 +43,27 @@ class _SudokuAnswerState extends State<SudokuAnswer> {
     }
   });
 
-  Tuple2<bool, List<List<int>>> solve(List<List<int>> values) {
-    bool isValid(int row, int col, int num) {
-      for (var i = 0; i < 9; i++) {
-        if (values[row][i] == num || values[i][col] == num) {
+  bool isValid(int row, int col, int num, List<List<int>> values) {
+    for (var i = 0; i < 9; i++) {
+      if (values[row][i] == num || values[i][col] == num) {
+        return false;
+      }
+    }
+
+    int subgridRow = row - row % 3;
+    int subgridCol = col - col % 3;
+    for (var i = 0; i < 3; i++) {
+      for (var j = 0; j < 3; j++) {
+        if (values[subgridRow + i][subgridCol + j] == num) {
           return false;
         }
       }
-
-      int subgridRow = row - row % 3;
-      int subgridCol = col - col % 3;
-      for (var i = 0; i < 3; i++) {
-        for (var j = 0; j < 3; j++) {
-          if (values[subgridRow + i][subgridCol + j] == num) {
-            return false;
-          }
-        }
-      }
-
-      return true;
     }
 
+    return true;
+  }
+
+  Tuple2<bool, List<List<int>>> solve(List<List<int>> values) {
     Tuple2<bool, List<List<int>>> solveHelper(int row, int col) {
       if (row == 9) {
         return Tuple2(true, values);
@@ -74,7 +75,7 @@ class _SudokuAnswerState extends State<SudokuAnswer> {
         return solveHelper(nextRow, nextCol);
       }
       for (var num in digits) {
-        if (isValid(row, col, num)) {
+        if (isValid(row, col, num, values)) {
           values[row][col] = num;
           var result = solveHelper(nextRow, nextCol);
           if (result.item1) {
@@ -89,9 +90,17 @@ class _SudokuAnswerState extends State<SudokuAnswer> {
     return solveHelper(0, 0);
   }
 
-  Tuple2<bool, List<List<int>>> solveAll(List<List<int>> grids) {
-    final result = solve(grids);
-    return Tuple2(true, result.item2);
+  bool isValidSudoku(List<List<int>> values) {
+    for (int i = 0; i < 9; i++) {
+      for (int j = 0; j < 9; j++) {
+        if (originalSudoku[i][j] != 0) {
+          if (!isValid(i, j, originalSudoku[i][j], originalSudoku)) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
   }
 
   void generateAnswer() {
@@ -99,11 +108,24 @@ class _SudokuAnswerState extends State<SudokuAnswer> {
       if (widget.sudoku.finalAnswer != null) {
         addedDigitsSudoku = widget.sudoku.finalAnswer!;
       } else {
-        final answer = solveAll(originalSudoku);
-        addedDigitsSudoku = answer.item2;
-        widget.sudoku.finalAnswer = answer.item2;
+        final isValidOriginalSudoku = isValidSudoku(originalSudoku);
+        if(!isValidOriginalSudoku){
+          labelText = "Invalid Sudoku, Solution doesn't exists";
+          buttonText = "Invalid";
+          return;
+        }
+        final answer = solve(originalSudoku);
+        if (answer.item1) {
+          addedDigitsSudoku = answer.item2;
+          widget.sudoku.finalAnswer = answer.item2;
+        } else {
+          labelText = "Invalid Sudoku, Solution doesn't exists";
+          buttonText = "Invalid";
+          return;
+        }
       }
       buttonText = "Solved";
+      labelText = "Answer generated";
     });
   }
 
@@ -163,7 +185,18 @@ class _SudokuAnswerState extends State<SudokuAnswer> {
                 style: const TextStyle(fontSize: 30.0),
               ),
             ),
-          )
+          ),
+          const SizedBox(height: 30.0),
+          Center(
+              child: SizedBox(
+            width: 400,
+            height: 70,
+            child: Text(
+              labelText,
+              style: const TextStyle(fontSize: 22.0),
+              textAlign: TextAlign.center,
+            ),
+          )),
         ],
       )),
     );

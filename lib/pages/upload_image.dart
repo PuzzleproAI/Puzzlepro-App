@@ -170,6 +170,14 @@ class _UploadImagePageState extends State<UploadImagePage> {
                 ),
               ],
             ),
+            Padding(
+              padding: const EdgeInsets.only(left: 32.0),
+              child: ElevatedButton.icon(
+                onPressed: saveButton,
+                icon: const Icon(Icons.lightbulb_outline_rounded),
+                label: const Text("Validate sudoku"),
+              ),
+            ),
           ],
         ),
       ),

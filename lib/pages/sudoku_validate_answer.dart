@@ -139,6 +139,7 @@ class _SudokuValidatorState extends State<SudokuValidator> {
     } else {
       setState(() {
         status = "Opps! Wrong filled 😅";
+        stateOfSudoku = 0;
       });
     }
   }
@@ -149,11 +150,11 @@ class _SudokuValidatorState extends State<SudokuValidator> {
     }
     if (isEqual(widget.sudoku.finalAnswer!, widget.sudoku.addedDigits!)) {
       setState(() {
-        status = "Correctly filled";
+        status = "Correctly filled till now.. 😀";
       });
     } else {
       setState(() {
-        status = "Wrong filled";
+        status = "Opps! Wrong filled 😅";
         stateOfSudoku = 1;
       });
     }
@@ -165,11 +166,11 @@ class _SudokuValidatorState extends State<SudokuValidator> {
     }
     if (isEqual(widget.sudoku.finalAnswer!, widget.sudoku.addedDigits!)) {
       setState(() {
-        status = "Correctly filled";
+        status = "Correctly filled till now.. 😀";
       });
     } else {
       setState(() {
-        status = "Wrong filled";
+        status = "Opps! Wrong filled 😅";
         stateOfSudoku = 2;
       });
     }
