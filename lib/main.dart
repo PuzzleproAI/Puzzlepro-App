@@ -5,6 +5,7 @@ import 'package:puzzlepro_app/pages/scan_sudoku.dart';
 import 'package:puzzlepro_app/pages/generate_sudoku.dart';
 import 'package:puzzlepro_app/services/database.dart';
 import 'package:puzzlepro_app/pages/settings.dart';
+import 'package:puzzlepro_app/services/database.dart';
 
 void main() async {
   await StorageHelper.initializeHive();
@@ -31,7 +32,13 @@ class _AppState extends State<App> {
   ColorSeed colorSelected = ColorSeed.teal;
   ColorScheme? colorScheme = const ColorScheme.highContrastDark();
 
-
+  void handleDeleteAllData() {
+    StorageHelper.DeleteAllData();
+    setState(() {
+      screenIndex = ScreenSelected.home.value;
+      title = "PuzzlePro";
+    });
+  }
 
 
   bool useLightMode(int theme) {

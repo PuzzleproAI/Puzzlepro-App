@@ -4,6 +4,10 @@ import 'package:puzzlepro_app/models/sudoku.dart';
 class StorageHelper {
   static const String sudokuBoxName = 'sudokuBox';
   static Box<Sudoku>? sudokuBox;
+  static int generatedSudokusCount =0;
+  static int scannedSudokusCount =0;
+  static int totalSudokus = 0;
+  static int pendingSudokus =0;
 
   static Future<void> initializeHive() async {
     await Hive.initFlutter();
@@ -66,4 +70,34 @@ class StorageHelper {
       await box.delete(index);
     }
   }
+
+  static Future<void> loadStatistics() async{
+    if (sudokuBox == null) {
+      initializeHive();
+    }
+
+    if (sudokuBox!.isOpen == true) {
+      final Box<Sudoku> box = await Hive.openBox<Sudoku>(sudokuBoxName);
+      totalSudokus = box.length;
+
+      scannedSudokusCount =
+          box.values.where((sudoku) => sudoku.isScanned).length;
+
+      generatedSudokusCount =
+         totalSudokus -
+          box.values.where((sudoku) => sudoku.isScanned).length;
+    }
+  }
+
+  static Future<void> DeleteAllData()async {
+    if (sudokuBox == null) {
+      initializeHive();
+    }
+
+    if (sudokuBox!.isOpen == true) {
+      final Box<Sudoku> box = await Hive.openBox<Sudoku>(sudokuBoxName);
+      await box.clear();
+    }
+  }
+
 }
