@@ -96,7 +96,7 @@ class _SudokuContentState extends State<SudokuContent> {
       final days = difference.inDays;
       return '$days ${_pluralize(days, "day")} ago';
     } else {
-      return '${date.day}/${date.month}/${date.year}';
+      return 'on ${date.day}/${date.month}/${date.year}';
     }
   }
 

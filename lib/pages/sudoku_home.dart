@@ -137,7 +137,23 @@ class _SudokuHomeState extends State<SudokuHome> {
       );
     }
   }
-
+  getSudokuStatus() {
+    int total = 0, remaining = 0;
+    for (int i = 0; i < 9; i++) {
+      for (int j = 0; j < 9; j++) {
+        if (sudoku.originalSudoku[i][j] == 0) {
+          total++;
+          if (sudoku.addedDigits![i][j] == 0) {
+            remaining++;
+          }
+        }
+      }
+    }
+    if (total == 0) {
+      return "100";
+    }
+    return ((total - remaining) * 100) ~/ total;
+  }
   Widget sudokuWidget() {
     return SizedBox(
       width: 350.0,
@@ -225,10 +241,10 @@ class _SudokuHomeState extends State<SudokuHome> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Expanded(
+                Expanded(
                   child: Text(
-                    "Some details here",
-                    style: TextStyle(fontSize: 16.0),
+                    "sudoku ${getSudokuStatus()}% completed",
+                    style: const TextStyle(fontSize: 16.0),
                   ),
                 ),
                 ElevatedButton(
