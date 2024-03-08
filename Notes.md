@@ -5,7 +5,7 @@
 2. Settings page. => Ayush currently working
 3. ~~Sudoku validation page and functionality => Dhrumil Done~~
 4. ~~Share and export sudoku functionality => Done~~
-5. Handwritten sudoku validation and scan. => working rn.
+5. ~~Handwritten sudoku validation and scan. => Done~~.
 6. Transitions 
 7. Animations
 
@@ -13,6 +13,7 @@
 
 1. Check network and server status before upload image
 2. ~~Verify before saving scanned image sudoku like generator page => Done~~
+3. Add back button action on following pages: All other than home page on navigator, sudoku home should go in home page.
 
 #### optional things
 

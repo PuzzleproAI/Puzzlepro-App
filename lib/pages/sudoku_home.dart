@@ -83,7 +83,7 @@ class _SudokuHomeState extends State<SudokuHome> {
 
   showSnackBar() {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Sudoku Saved successfully.')),
+      const SnackBar(content: Text('Sudoku Saved successfully.'),behavior: SnackBarBehavior.floating,duration: Duration(seconds: 1),),
     );
   }
 
@@ -112,11 +112,41 @@ class _SudokuHomeState extends State<SudokuHome> {
     goToHome();
   }
 
+  bool checkAllDigitsAddedHome(addedDigits) {
+    for (int i = 0; i < 9; i++) {
+      for (int j = 0; j < 9; j++) {
+        if (addedDigits[i][j] == 0) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+  checkAnswerPress(){
+    if(checkAllDigitsAddedHome(sudoku.addedDigits)){
+      Navigator.push(context,
+          MaterialPageRoute(builder: (BuildContext context) {
+            return SudokuAnswerChecker(
+              sudoku: sudoku,
+            );
+          }));
+    }
+    else{
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all the digits.'),behavior: SnackBarBehavior.floating,duration: Duration(seconds: 1),),
+      );
+    }
+  }
+
   Widget sudokuWidget() {
     return SizedBox(
       width: 350.0,
       height: 350.0,
-      child: CustomPaint(
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: _colorScheme.background,
+        ),
+        child: CustomPaint(
         painter: LinesPainter(_colorScheme),
         child: GridView.builder(
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -146,6 +176,7 @@ class _SudokuHomeState extends State<SudokuHome> {
           },
         ),
       ),
+    ),
     );
   }
 
@@ -201,14 +232,7 @@ class _SudokuHomeState extends State<SudokuHome> {
                   ),
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (BuildContext context) {
-                      return SudokuAnswerChecker(
-                        sudoku: sudoku,
-                      );
-                    }));
-                  },
+                  onPressed: checkAnswerPress,
                   child: Text(
                     "Check Answer",
                     style: TextStyle(color: _colorScheme.primary),

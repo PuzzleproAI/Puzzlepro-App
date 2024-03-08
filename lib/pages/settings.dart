@@ -141,12 +141,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   },
                   child: Text(
                     'Delete All Sudokus',
-                    style: TextStyle(fontSize: 18,color: Colors.black,height: 2),
-                  ),
-                  style: ElevatedButton.styleFrom(
-
-                    primary: _colorScheme.primary,
-                    // Set the button color
+                    style: TextStyle(fontSize: 18,height: 3),
                   ),
                 ),
               ),

@@ -231,7 +231,7 @@ class _ImageProcessingPageState extends State<ImageProcessingPage> {
     } else {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Image picking canceled')),
+        const SnackBar(content: Text('Image picking canceled'),behavior: SnackBarBehavior.floating,duration: Duration(seconds: 1),),
       );
     }
   }
@@ -256,7 +256,7 @@ class _ImageProcessingPageState extends State<ImageProcessingPage> {
     } else {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Image capture canceled')),
+        const SnackBar(content: Text('Image capture canceled'),behavior: SnackBarBehavior.floating,duration: Duration(seconds: 1),),
       );
     }
   }
