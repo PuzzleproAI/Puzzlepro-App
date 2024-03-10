@@ -1,13 +1,10 @@
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:puzzlepro_app/models/statistics.dart';
 import 'package:puzzlepro_app/models/sudoku.dart';
 
 class StorageHelper {
   static const String sudokuBoxName = 'sudokuBox';
   static Box<Sudoku>? sudokuBox;
-  static int generatedSudokusCount =0;
-  static int scannedSudokusCount =0;
-  static int totalSudokus = 0;
-  static int pendingSudokus =0;
 
   static Future<void> initializeHive() async {
     await Hive.initFlutter();
@@ -85,25 +82,30 @@ class StorageHelper {
     }
   }
 
-  static Future<void> loadStatistics() async{
+  static Future<StatisticData?> loadStatistics() async {
     if (sudokuBox == null) {
       initializeHive();
     }
 
     if (sudokuBox!.isOpen == true) {
       final Box<Sudoku> box = await Hive.openBox<Sudoku>(sudokuBoxName);
-      totalSudokus = box.length;
+      var totalSudoku = box.length;
 
-      scannedSudokusCount =
-          box.values.where((sudoku) => sudoku.isScanned).length;
+      var generatedSudokuCount =
+          box.values.where((sudoku) => sudoku.isScanned == false).length;
 
-      generatedSudokusCount =
-         totalSudokus -
-          box.values.where((sudoku) => sudoku.isScanned).length;
+      var totalSudokuSolvedByApp = 0; // not implemented for now..
+
+      var pendingSudoku =
+          box.values.where((sudoku) => sudoku.isComplete == false).length;
+      StatisticData statisticData = StatisticData.all(generatedSudokuCount,
+          totalSudoku, pendingSudoku, totalSudokuSolvedByApp);
+      return statisticData;
     }
+    return null;
   }
 
-  static Future<void> DeleteAllData()async {
+  static Future<void> deleteAllData() async {
     if (sudokuBox == null) {
       initializeHive();
     }
@@ -113,5 +115,4 @@ class StorageHelper {
       await box.clear();
     }
   }
-
 }
