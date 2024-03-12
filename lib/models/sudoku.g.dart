@@ -29,13 +29,14 @@ class SudokuAdapter extends TypeAdapter<Sudoku> {
       ..isComplete = fields[4] as bool
       ..finalAnswer = (fields[7] as List?)
           ?.map((dynamic e) => (e as List).cast<int>())
-          ?.toList();
+          ?.toList()
+      ..isGeneratedByApp = fields[8] as bool;
   }
 
   @override
   void write(BinaryWriter writer, Sudoku obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.originalSudoku)
       ..writeByte(1)
@@ -51,7 +52,9 @@ class SudokuAdapter extends TypeAdapter<Sudoku> {
       ..writeByte(6)
       ..write(obj.difficulty)
       ..writeByte(7)
-      ..write(obj.finalAnswer);
+      ..write(obj.finalAnswer)
+      ..writeByte(8)
+      ..write(obj.isGeneratedByApp);
   }
 
   @override

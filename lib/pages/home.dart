@@ -8,14 +8,10 @@ class Home extends StatefulWidget {
     super.key,
 
     required this.useMaterial3,
-    required this.handleBrightnessChange,
-    required this.handleColorSelect,
   });
 
 
   final bool useMaterial3;
-  final void Function(bool useLightMode) handleBrightnessChange;
-  final void Function(int value) handleColorSelect;
 
   @override
   State<Home> createState() => _HomeState();

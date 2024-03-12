@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:puzzlepro_app/Data/constants.dart';
+import 'package:puzzlepro_app/models/theme_data.dart';
 import 'package:puzzlepro_app/pages/home.dart';
 import 'package:puzzlepro_app/pages/scan_sudoku.dart';
 import 'package:puzzlepro_app/pages/generate_sudoku.dart';
 import 'package:puzzlepro_app/services/database.dart';
 import 'package:puzzlepro_app/pages/settings.dart';
-import 'package:puzzlepro_app/services/database.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   await StorageHelper.initializeHive();
-  runApp(const App());
+  runApp(ChangeNotifierProvider(
+      create: (context) => ThemeDataModel(),
+      child: const App()
+  ));
 }
 
 class App extends StatefulWidget {
@@ -26,19 +31,21 @@ class _AppState extends State<App> {
   bool showLargeSizeLayout = false;
   List<String> titleList = ["PuzzlePro", "Scan", "Generator", "Settings"];
   String title = "PuzzlePro";
-
   bool useMaterial3 = true;
   ThemeMode themeMode = ThemeMode.dark;
   ColorSeed colorSelected = ColorSeed.teal;
-  ColorScheme? colorScheme = const ColorScheme.highContrastDark();
-  
+  ThemeDataModel? themeDataModel;
+
   bool useLightMode(int theme) {
     switch (theme) {
       case 0:
         setState(() {
           themeMode = ThemeMode.system;
         });
-        return View.of(context).platformDispatcher.platformBrightness ==
+        return View
+            .of(context)
+            .platformDispatcher
+            .platformBrightness ==
             Brightness.light;
       case 1:
         setState(() {
@@ -54,15 +61,12 @@ class _AppState extends State<App> {
     return false;
   }
 
-  void handleBrightnessChange(bool useLightMode) {
+  void changeColorScheme(ColorSeed colorSeed, bool isAuto) {
+    if (isAuto) {
+      return;
+    }
     setState(() {
-      themeMode = useLightMode ? ThemeMode.light : ThemeMode.dark;
-    });
-  }
-
-  void handleColorSelect(int value) {
-    setState(() {
-      colorSelected = ColorSeed.values[value];
+      colorSelected = colorSeed;
     });
   }
 
@@ -78,7 +82,10 @@ class _AppState extends State<App> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final double width = MediaQuery.of(context).size.width;
+    final double width = MediaQuery
+        .of(context)
+        .size
+        .width;
     if (width > mediumWidthBreakpoint) {
       if (width > largeWidthBreakpoint) {
         showMediumSizeLayout = false;
@@ -93,13 +100,16 @@ class _AppState extends State<App> {
     }
   }
 
+  setThemeValues(ThemeDataModel themeDataModel) {
+    changeColorScheme(themeDataModel.colorSelected, themeDataModel.isAutoTheme);
+    useLightMode(themeDataModel.isLightTheme);
+  }
+
   Widget getScreen(ScreenSelected screenSelected) {
     switch (screenSelected) {
       case ScreenSelected.home:
         return Home(
           useMaterial3: useMaterial3,
-          handleBrightnessChange: handleBrightnessChange,
-          handleColorSelect: handleColorSelect,
         );
       case ScreenSelected.scanner:
         return const ImageProcessingPage();
@@ -110,13 +120,28 @@ class _AppState extends State<App> {
       case ScreenSelected.setting:
         return SettingsPage(
           changeTheme: useLightMode,
+          changeColor: changeColorScheme,
         );
-      //   return const SettingsPage();
+    //   return const SettingsPage();
     }
+  }
+
+  setTheme(ThemeDataModel themeModeSetter) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    bool? isLightMode = sharedPreferences.getBool('isLightMode') ?? false;
+    themeModeSetter.setTheme(isLightMode);
+    bool? isAuto = sharedPreferences.getBool('isLightMode') ?? false;
+    ColorSeed colorSeed = ColorSeed.values[sharedPreferences.getInt(
+        'isLightMode') ?? 0];
+    themeModeSetter.setColorScheme(isAuto, colorSeed);
   }
 
   @override
   Widget build(BuildContext context) {
+    // final themeModeTemp = Provider.of<ThemeDataModel>(context);
+    // setTheme(themeModeTemp);
+    // themeDataModel = themeModeTemp;
+    // setThemeValues(themeModeTemp);
     var bottomNavigationBarItems = const <Widget>[
       NavigationDestination(
         icon: Icon(Icons.home_rounded),

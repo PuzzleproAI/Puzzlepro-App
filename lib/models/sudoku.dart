@@ -28,12 +28,16 @@ class Sudoku {
   @HiveField(7)
   List<List<int>>? finalAnswer;
 
+  @HiveField(8)
+  bool isGeneratedByApp;
+
   int id = 0;
 
   Sudoku(this.originalSudoku, this.isScanned, this.difficulty)
       : createdAt = DateTime.now(),
         lastViewed = DateTime.now(),
         addedDigits = originalSudoku,
+        isGeneratedByApp = false,
         isComplete = false;
 
   Sudoku.empty()
@@ -63,6 +67,7 @@ class Sudoku {
         difficulty = "NA",
         createdAt = DateTime.now(),
         lastViewed = DateTime.now(),
+        isGeneratedByApp = false,
         isComplete = false;
 
   Sudoku.correct()
@@ -92,20 +97,21 @@ class Sudoku {
         difficulty = "NA",
         createdAt = DateTime.now(),
         lastViewed = DateTime.now(),
+        isGeneratedByApp = false,
         isComplete = false;
 
   Sudoku.incorrect()
       : originalSudoku = [
-    [5, 3, 0, 0, 7, 0, 0, 0, 0],
-    [6, 0, 0, 1, 9, 5, 0, 0, 0],
-    [0, 9, 8, 0, 0, 0, 0, 6, 0],
-    [8, 0, 0, 0, 6, 3, 4, 0, 3],
-    [4, 0, 0, 8, 0, 3, 0, 0, 1],
-    [7, 0, 0, 0, 2, 0, 0, 0, 6],
-    [0, 6, 0, 0, 0, 0, 2, 8, 0],
-    [0, 0, 0, 4, 1, 9, 0, 0, 5],
-    [0, 0, 0, 0, 8, 0, 0, 7, 9]
-  ],
+          [5, 3, 0, 0, 7, 0, 0, 0, 0],
+          [6, 0, 0, 1, 9, 5, 0, 0, 0],
+          [0, 9, 8, 0, 0, 0, 0, 6, 0],
+          [8, 0, 0, 0, 6, 3, 4, 0, 3],
+          [4, 0, 0, 8, 0, 3, 0, 0, 1],
+          [7, 0, 0, 0, 2, 0, 0, 0, 6],
+          [0, 6, 0, 0, 0, 0, 2, 8, 0],
+          [0, 0, 0, 4, 1, 9, 0, 0, 5],
+          [0, 0, 0, 0, 8, 0, 0, 7, 9]
+        ],
         addedDigits = [
           [5, 3, 0, 0, 7, 0, 0, 0, 0],
           [6, 0, 0, 1, 9, 5, 0, 0, 0],
@@ -121,6 +127,7 @@ class Sudoku {
         difficulty = "NA",
         createdAt = DateTime.now(),
         lastViewed = DateTime.now(),
+        isGeneratedByApp = false,
         isComplete = false;
 
   Sudoku copy() {
@@ -135,13 +142,14 @@ class Sudoku {
           ? List.generate(9, (i) => List<int>.from(addedDigits![i]))
           : null
       ..isComplete = isComplete
+      ..isGeneratedByApp = isGeneratedByApp
       ..finalAnswer = finalAnswer != null
           ? List.generate(9, (i) => List<int>.from(finalAnswer![i]))
           : null;
   }
 
   @override
-  String toString(){
+  String toString() {
     return originalSudoku.toString() + addedDigits.toString();
   }
 }

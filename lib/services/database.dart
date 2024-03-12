@@ -94,7 +94,8 @@ class StorageHelper {
       var generatedSudokuCount =
           box.values.where((sudoku) => sudoku.isScanned == false).length;
 
-      var totalSudokuSolvedByApp = 0; // not implemented for now..
+      var totalSudokuSolvedByApp =
+          box.values.where((sudoku) => sudoku.isGeneratedByApp == true).length;
 
       var pendingSudoku =
           box.values.where((sudoku) => sudoku.isComplete == false).length;
