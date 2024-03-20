@@ -9,16 +9,32 @@ import 'package:puzzlepro_app/services/database.dart';
 import 'package:puzzlepro_app/pages/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+setThemeFromStorage() async {
+  var themeModel = ThemeDataModel();
+  SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  int isLightMode = sharedPreferences.getInt('isLightMode') ?? 2;
+  themeModel.setTheme(isLightMode);
+  ColorSeed colorSeed =
+      ColorSeed.values[sharedPreferences.getInt('colorSeed') ?? 2];
+  themeModel.setColorScheme(colorSeed);
+  return themeModel;
+}
+
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await StorageHelper.initializeHive();
+  var themeModeValues = await setThemeFromStorage();
   runApp(ChangeNotifierProvider(
       create: (context) => ThemeDataModel(),
-      child: const App()
-  ));
+      child: App(
+        themeValues: themeModeValues,
+      )));
 }
 
 class App extends StatefulWidget {
-  const App({super.key});
+  final ThemeDataModel themeValues;
+
+  const App({super.key, required this.themeValues});
 
   @override
   State<App> createState() => _AppState();
@@ -35,6 +51,17 @@ class _AppState extends State<App> {
   ThemeMode themeMode = ThemeMode.dark;
   ColorSeed colorSelected = ColorSeed.teal;
   ThemeDataModel? themeDataModel;
+  bool isLoaded = false;
+
+  @override
+  void initState() {
+    setState(() {
+      themeDataModel = widget.themeValues;
+      themeMode = widget.themeValues.getTheme();
+      colorSelected = widget.themeValues.colorSelected;
+    });
+    super.initState();
+  }
 
   bool useLightMode(int theme) {
     switch (theme) {
@@ -42,10 +69,7 @@ class _AppState extends State<App> {
         setState(() {
           themeMode = ThemeMode.system;
         });
-        return View
-            .of(context)
-            .platformDispatcher
-            .platformBrightness ==
+        return View.of(context).platformDispatcher.platformBrightness ==
             Brightness.light;
       case 1:
         setState(() {
@@ -61,10 +85,7 @@ class _AppState extends State<App> {
     return false;
   }
 
-  void changeColorScheme(ColorSeed colorSeed, bool isAuto) {
-    if (isAuto) {
-      return;
-    }
+  void changeColorScheme(ColorSeed colorSeed) {
     setState(() {
       colorSelected = colorSeed;
     });
@@ -82,10 +103,7 @@ class _AppState extends State<App> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final double width = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final double width = MediaQuery.of(context).size.width;
     if (width > mediumWidthBreakpoint) {
       if (width > largeWidthBreakpoint) {
         showMediumSizeLayout = false;
@@ -101,8 +119,8 @@ class _AppState extends State<App> {
   }
 
   setThemeValues(ThemeDataModel themeDataModel) {
-    changeColorScheme(themeDataModel.colorSelected, themeDataModel.isAutoTheme);
-    useLightMode(themeDataModel.isLightTheme);
+    useLightMode(themeDataModel.themeValue);
+    changeColorScheme(themeDataModel.colorSelected);
   }
 
   Widget getScreen(ScreenSelected screenSelected) {
@@ -121,27 +139,55 @@ class _AppState extends State<App> {
         return SettingsPage(
           changeTheme: useLightMode,
           changeColor: changeColorScheme,
+          themeModel: themeDataModel!,
         );
-    //   return const SettingsPage();
+      //   return const SettingsPage();
     }
   }
 
-  setTheme(ThemeDataModel themeModeSetter) async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    bool? isLightMode = sharedPreferences.getBool('isLightMode') ?? false;
-    themeModeSetter.setTheme(isLightMode);
-    bool? isAuto = sharedPreferences.getBool('isLightMode') ?? false;
-    ColorSeed colorSeed = ColorSeed.values[sharedPreferences.getInt(
-        'isLightMode') ?? 0];
-    themeModeSetter.setColorScheme(isAuto, colorSeed);
+  getBrightness(ThemeMode mode) {
+    switch (mode) {
+      case ThemeMode.dark:
+        return Brightness.dark;
+      case ThemeMode.light:
+        return Brightness.light;
+      case ThemeMode.system:
+        return View.of(context).platformDispatcher.platformBrightness;
+    }
+  }
+
+  getColorScheme() {
+    return ColorScheme.fromSeed(seedColor: colorSelected.color)
+        .copyWith(brightness: getBrightness(themeMode));
+  }
+
+  setTheme(ThemeDataModel themeModeSetter) {
+    SharedPreferences.getInstance().then((SharedPreferences sharedPreferences) {
+      int isLightMode =
+          sharedPreferences.getInt('isLightMode') ?? themeDataModel!.themeValue;
+      themeModeSetter.setTheme(isLightMode);
+      var colorIndex = sharedPreferences.getInt('colorSeed');
+      ColorSeed colorSeed;
+      if (colorIndex == null) {
+        colorSeed = themeDataModel!.colorSelected;
+      } else {
+        colorSeed = ColorSeed.values[colorIndex];
+      }
+      themeModeSetter.setColorScheme(colorSeed);
+      setThemeValues(themeModeSetter);
+      setState(() {
+        isLoaded = true;
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    // final themeModeTemp = Provider.of<ThemeDataModel>(context);
-    // setTheme(themeModeTemp);
-    // themeDataModel = themeModeTemp;
-    // setThemeValues(themeModeTemp);
+    useLightMode(themeDataModel!.themeValue);
+    changeColorScheme(themeDataModel!.colorSelected);
+    ThemeDataModel themeModeTemp = Provider.of<ThemeDataModel>(context);
+    themeDataModel = themeModeTemp;
+    setTheme(themeModeTemp);
     var bottomNavigationBarItems = const <Widget>[
       NavigationDestination(
         icon: Icon(Icons.home_rounded),
@@ -160,48 +206,54 @@ class _AppState extends State<App> {
         label: 'Settings',
       ),
     ];
-    return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        themeMode: themeMode,
-        theme: ThemeData(
-            fontFamily: 'Rubik',
-            colorSchemeSeed: colorSelected.color,
-            useMaterial3: true,
-            brightness: Brightness.light,
-            appBarTheme: const AppBarTheme(
-              surfaceTintColor: Colors.transparent,
-            )),
-        darkTheme: ThemeData(
-            fontFamily: 'Rubik',
-            colorSchemeSeed: colorSelected.color,
-            useMaterial3: true,
-            brightness: Brightness.dark,
-            appBarTheme: const AppBarTheme(
-              surfaceTintColor: Colors.transparent,
-            )),
-        home: Scaffold(
-          appBar: AppBar(
-            title: Text(
-              title,
-              style: const TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 27.0,
+    return isLoaded
+        ? MaterialApp(
+            debugShowCheckedModeBanner: false,
+            themeMode: themeMode,
+            theme: ThemeData(
+                fontFamily: 'Rubik',
+                colorSchemeSeed: colorSelected.color,
+                useMaterial3: true,
+                brightness: Brightness.light,
+                appBarTheme: const AppBarTheme(
+                  surfaceTintColor: Colors.transparent,
+                )),
+            darkTheme: ThemeData(
+                fontFamily: 'Rubik',
+                colorSchemeSeed: colorSelected.color,
+                useMaterial3: true,
+                brightness: Brightness.dark,
+                appBarTheme: const AppBarTheme(
+                  surfaceTintColor: Colors.transparent,
+                )),
+            home: Scaffold(
+              appBar: AppBar(
+                title: Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 27.0,
+                  ),
+                ),
               ),
+              // body: const SudokuHome(),
+              body: getScreen(ScreenSelected.values[screenIndex]),
+              // body: const ScanOptionsPage(),
+              bottomNavigationBar: NavigationBar(
+                onDestinationSelected: (int index) {
+                  setState(() {
+                    screenIndex = index;
+                    title = titleList[index];
+                  });
+                },
+                destinations: bottomNavigationBarItems,
+                selectedIndex: screenIndex,
+              ),
+            ))
+        : const MaterialApp(
+            home: Scaffold(
+              body: Center(child: Text('Loading')),
             ),
-          ),
-          // body: const SudokuHome(),
-          body: getScreen(ScreenSelected.values[screenIndex]),
-          // body: const ScanOptionsPage(),
-          bottomNavigationBar: NavigationBar(
-            onDestinationSelected: (int index) {
-              setState(() {
-                screenIndex = index;
-                title = titleList[index];
-              });
-            },
-            destinations: bottomNavigationBarItems,
-            selectedIndex: screenIndex,
-          ),
-        ));
+          );
   }
 }

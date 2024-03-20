@@ -1,26 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:puzzlepro_app/Data/constants.dart';
+import 'package:puzzlepro_app/models/theme_data.dart';
 import 'package:puzzlepro_app/services/database.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage(
-      {super.key, required this.changeTheme, required this.changeColor});
+      {super.key,
+      required this.changeTheme,
+      required this.changeColor,
+      required this.themeModel});
 
   final Function(int) changeTheme;
-  final Function(ColorSeed, bool) changeColor;
+  final Function(ColorSeed) changeColor;
+  final ThemeDataModel themeModel;
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();
 }
 
+List<String> themeOptions = ['System Mode', 'Light Mode', 'Dark Mode'];
+
 class _SettingsPageState extends State<SettingsPage> {
   List<ColorSeed> colorOptions = ColorSeed.values.toList();
-  bool isAuto = false;
-
   Color? selectedColor;
-
+  int selectedColorIndex = 0;
+  int themeValue = 0;
   String _selectedTheme = 'System Mode';
-  late ColorScheme _colorScheme = Theme.of(context).colorScheme;
 
   int scannedSudokuCount = 0;
   int generatedSudokuCount = 0;
@@ -38,6 +44,35 @@ class _SettingsPageState extends State<SettingsPage> {
   void initState() {
     super.initState();
     fetchStatistics();
+    setState(() {
+      _selectedTheme = themeOptions[widget.themeModel.themeValue];
+      themeValue = widget.themeModel.themeValue;
+      selectedColor = colorOptions[widget.themeModel.colorSelected.index].color;
+    });
+  }
+
+  getBrightness(int value) {
+    switch (value) {
+      case 0:
+        return View.of(context).platformDispatcher.platformBrightness;
+      case 1:
+        return Brightness.light;
+      case 2:
+        return Brightness.dark;
+    }
+    return Brightness.dark;
+  }
+
+  saveTheme(int themeValue) async {
+    final SharedPreferences sharedPreferences =
+        await SharedPreferences.getInstance();
+    sharedPreferences.setInt('isLightMode', themeValue);
+  }
+
+  saveColorSelected() async {
+    final SharedPreferences sharedPreferences =
+        await SharedPreferences.getInstance();
+    sharedPreferences.setInt('colorSeed', selectedColorIndex);
   }
 
   fetchStatistics() async {
@@ -75,14 +110,13 @@ class _SettingsPageState extends State<SettingsPage> {
                     if (newValue != null) {
                       setState(() {
                         _selectedTheme = newValue;
-                        if (newValue == 'System Mode') {
-                          widget.changeTheme(0);
-                        } else if (newValue == 'Light Mode') {
-                          widget.changeTheme(1);
+                        if (newValue == 'Light Mode') {
+                          themeValue = 1;
                         } else if (newValue == 'Dark Mode') {
-                          widget.changeTheme(2);
+                          themeValue = 2;
                         }
-                        _colorScheme = Theme.of(context).colorScheme;
+                        widget.changeTheme(themeValue);
+                        saveTheme(themeValue);
                       });
                     }
                   },
@@ -122,19 +156,19 @@ class _SettingsPageState extends State<SettingsPage> {
                                 colorOptions[i * colorOptions.length ~/ 3 + j]
                                         .color ==
                                     selectedColor,
-                            colorScheme: _colorScheme,
                             dimension:
                                 MediaQuery.of(context).size.width.toInt() / 11,
                             onTap: () {
-                              widget.changeColor(
-                                  colorOptions[
-                                      i * colorOptions.length ~/ 3 + j],
-                                  false);
+                              widget.changeColor(colorOptions[
+                                  i * colorOptions.length ~/ 3 + j]);
                               setState(() {
                                 selectedColor = colorOptions[
                                         i * colorOptions.length ~/ 3 + j]
                                     .color;
+                                selectedColorIndex =
+                                    i * colorOptions.length ~/ 3 + j;
                               });
+                              saveColorSelected();
                             },
                           ),
                         ),
@@ -143,7 +177,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
             ),
             const SizedBox(height: 16),
-            Divider(color: _colorScheme.primary),
+            const Divider(),
             const SizedBox(height: 16),
             const Text(
               'Statistics of app usage',
@@ -155,11 +189,11 @@ class _SettingsPageState extends State<SettingsPage> {
               children: [
                 Text(
                   'Scanned Sudoku: $scannedSudokuCount',
-                  style: TextStyle(fontSize: 15, color: _colorScheme.primary),
+                  style: const TextStyle(fontSize: 15),
                 ),
                 Text(
                   'Generated Sudoku: $generatedSudokuCount',
-                  style: TextStyle(fontSize: 15, color: _colorScheme.primary),
+                  style: const TextStyle(fontSize: 15),
                 ),
               ],
             ),
@@ -184,7 +218,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
             ),
             const SizedBox(height: 16),
-            Divider(color: _colorScheme.primary),
+            const Divider(),
             // Add more settings as needed
             const SizedBox(
               height: 16,
@@ -214,8 +248,7 @@ class _SettingsPageState extends State<SettingsPage> {
 class RoundColorButton extends StatelessWidget {
   final Color color;
   final bool isSelected;
-  final VoidCallback onTap;
-  final ColorScheme colorScheme;
+  final Function() onTap;
   final double dimension;
 
   const RoundColorButton({
@@ -223,7 +256,6 @@ class RoundColorButton extends StatelessWidget {
     required this.color,
     required this.isSelected,
     required this.onTap,
-    required this.colorScheme,
     required this.dimension,
   });
 
@@ -236,8 +268,7 @@ class RoundColorButton extends StatelessWidget {
         shape: BoxShape.circle,
         color: color,
         border: Border.all(
-            color: isSelected ? colorScheme.secondary : Colors.transparent,
-            width: 4),
+            color: isSelected ? Colors.black : Colors.transparent, width: 4),
       ),
       child: Material(
         color: Colors.transparent,
@@ -248,12 +279,12 @@ class RoundColorButton extends StatelessWidget {
             alignment: Alignment.topRight,
             children: [
               if (isSelected)
-                Padding(
-                  padding: const EdgeInsets.all(4.0),
+                const Padding(
+                  padding: EdgeInsets.all(6.0),
                   child: Icon(
-                    Icons.check,
-                    color: colorScheme.secondary,
-                    size: 16,
+                    Icons.check_circle,
+                    color: Colors.black87,
+                    size: 19,
                   ),
                 ),
             ],

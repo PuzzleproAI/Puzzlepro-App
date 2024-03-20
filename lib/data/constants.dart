@@ -24,6 +24,8 @@ enum ColorSeed {
   brown("Brown", Colors.brown),
   deepPurple("DeepPurple", Colors.deepPurple),
   cyan("Cyan", Colors.cyan),
+  lightBlue("LightBlue", Colors.lightBlueAccent),
+  tealAccent("TealAccent", Colors.tealAccent),
   lightGreen("LightGreen", Colors.lightGreen);
 
   const ColorSeed(this.label, this.color);

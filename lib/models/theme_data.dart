@@ -2,29 +2,39 @@ import 'package:flutter/material.dart';
 import 'package:puzzlepro_app/Data/constants.dart';
 
 class ThemeDataModel with ChangeNotifier {
-  int isLightTheme;
+  int themeValue;
 
   ColorSeed colorSelected;
 
-  bool isAutoTheme;
-  void setTheme(bool isLightTheme) {
-    isLightTheme = isLightTheme;
+  void setTheme(int themeValue) {
+    this.themeValue = themeValue;
     notifyListeners();
   }
 
-  void setColorScheme(bool isAuto, ColorSeed colorSelected) {
-    isAutoTheme = isAuto;
-    if (!isAuto) {
-      this.colorSelected = colorSelected;
-    }
+  void setColorScheme(ColorSeed colorSelected) {
+    this.colorSelected = colorSelected;
     notifyListeners();
+  }
+
+  getTheme(){
+    switch (themeValue) {
+      case 0:
+          return ThemeMode.system;
+      case 1:
+          return ThemeMode.light;
+      case 2:
+          return ThemeMode.dark;
+    }
+  }
+
+  getColorScheme(){
+    return colorSelected;
   }
 
   ThemeDataModel()
-      : isLightTheme = 0,
-        colorSelected = ColorSeed.teal,
-        isAutoTheme = false;
+      : themeValue = 0,
+        colorSelected = ColorSeed.teal;
 
   ThemeDataModel.create(
-      this.isLightTheme, this.colorSelected, this.isAutoTheme);
+      this.themeValue, this.colorSelected);
 }
