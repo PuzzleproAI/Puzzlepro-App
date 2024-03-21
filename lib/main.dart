@@ -41,7 +41,9 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-  int screenIndex = ScreenSelected.home.value;
+  Key _key = UniqueKey();
+
+  int screenIndex = ScreenSelected.scanner.value;
   bool controllerInitialized = false;
   bool showMediumSizeLayout = false;
   bool showLargeSizeLayout = false;
@@ -62,7 +64,11 @@ class _AppState extends State<App> {
     });
     super.initState();
   }
-
+  void restartApp() {
+    setState(() {
+      _key = UniqueKey();
+    });
+  }
   bool useLightMode(int theme) {
     switch (theme) {
       case 0:
@@ -178,6 +184,7 @@ class _AppState extends State<App> {
       setState(() {
         isLoaded = true;
       });
+      restartApp();
     });
   }
 
