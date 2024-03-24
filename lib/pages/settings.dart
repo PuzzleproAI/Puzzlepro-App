@@ -34,10 +34,9 @@ class _SettingsPageState extends State<SettingsPage> {
   int totalPendingSudoku = 0;
   bool isDataFetched = false;
 
-  void deleteData() {
-    setState(() {
-      StorageHelper.deleteAllData();
-    });
+  void deleteData() async {
+    await StorageHelper.deleteAllData();
+    await fetchStatistics();
   }
 
   @override
@@ -189,11 +188,11 @@ class _SettingsPageState extends State<SettingsPage> {
               children: [
                 Text(
                   'Scanned Sudoku: $scannedSudokuCount',
-                  style: const TextStyle(fontSize: 15),
+                  style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
                 ),
                 Text(
                   'Generated Sudoku: $generatedSudokuCount',
-                  style: const TextStyle(fontSize: 15),
+                  style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
                 ),
               ],
             ),
@@ -203,7 +202,7 @@ class _SettingsPageState extends State<SettingsPage> {
               children: [
                 Text(
                   'Total Sudoku: $totalSudoku',
-                  style: const TextStyle(fontSize: 18),
+                  style: const TextStyle(fontSize: 17),
                 ),
               ],
             ),
@@ -213,7 +212,11 @@ class _SettingsPageState extends State<SettingsPage> {
               children: [
                 Text(
                   'Total pending Sudoku: $totalPendingSudoku',
-                  style: const TextStyle(fontSize: 18),
+                  style: const TextStyle(fontSize: 17),
+                ),
+                Text(
+                  'Total Solved Sudoku: ${totalSudoku - totalPendingSudoku}',
+                  style: const TextStyle(fontSize: 17),
                 )
               ],
             ),
@@ -279,8 +282,7 @@ class RoundColorButton extends StatelessWidget {
             alignment: Alignment.topRight,
             children: [
               if (isSelected)
-                const Padding(
-                  padding: EdgeInsets.all(6.0),
+                const Center(
                   child: Icon(
                     Icons.check_circle,
                     color: Colors.black87,

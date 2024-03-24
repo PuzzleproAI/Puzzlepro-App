@@ -247,7 +247,7 @@ class _AppState extends State<App> {
                   return FadeThroughTransition(
                     animation: animation,
                     secondaryAnimation: secondaryAnimation,
-                    fillColor: Theme.of(context).colorScheme.surface,
+                    fillColor: Colors.transparent,
                     child: child,
                   );
                 },
