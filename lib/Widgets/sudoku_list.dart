@@ -6,6 +6,7 @@ import 'package:puzzlepro_app/pages/sudoku_home.dart';
 enum ItemFilter { all, incomplete, completed }
 
 class SudokuListView extends StatefulWidget {
+  final Function() getIsLoaded;
   final Map<dynamic, Sudoku> sudokuList;
   final Function(int) onDelete;
   final Future<void> Function() onRefresh;
@@ -15,6 +16,7 @@ class SudokuListView extends StatefulWidget {
     required this.sudokuList,
     required this.onDelete,
     required this.onRefresh,
+    required this.getIsLoaded,
   });
 
   @override
@@ -23,8 +25,12 @@ class SudokuListView extends StatefulWidget {
 
 class _SudokuListViewState extends State<SudokuListView> {
   ItemFilter currentFilter = ItemFilter.all;
+  bool isLoaded = true;
 
   Map<dynamic, Sudoku> getFilteredItems() {
+    setState(() {
+      isLoaded = false;
+    });
     switch (currentFilter) {
       case ItemFilter.all:
         return widget.sudokuList;
@@ -86,7 +92,7 @@ class _SudokuListViewState extends State<SudokuListView> {
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: RefreshIndicator(
               onRefresh: widget.onRefresh,
-              child: getFilteredItems().isNotEmpty
+              child: getFilteredItems().isNotEmpty && widget.getIsLoaded()
                   ? ListView(
                       children: [
                         const SizedBox(height: 8),
@@ -119,34 +125,36 @@ class _SudokuListViewState extends State<SudokuListView> {
                         ),
                       ],
                     )
-                  : const Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.error_outline_rounded,
-                              size: 80.0,
+                  : widget.getIsLoaded()
+                      ? const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(16.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.error_outline_rounded,
+                                  size: 80.0,
+                                ),
+                                SizedBox(height: 16.0),
+                                Text(
+                                  'No sudoku to display',
+                                  style: TextStyle(
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: 8.0),
+                                Text(
+                                  'Your collection is empty. Add some sudoku to get started.',
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
                             ),
-                            SizedBox(height: 16.0),
-                            Text(
-                              'No sudoku to display',
-                              style: TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 8.0),
-                            Text(
-                              'Your collection is empty. Add some sudoku to get started.',
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                          ),
+                        )
+                      : const Center(),
             ),
           ),
         ),

@@ -190,6 +190,7 @@ class _UploadImagePageState extends State<UploadImagePage> {
     Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
       return SudokuAnswer(
         sudoku: generatedSudoku!,
+        index: 0,
       );
     }));
   }

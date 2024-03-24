@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:puzzlepro_app/services/database.dart';
 import '../models/sudoku.dart';
 
 class Tuple2<A, B> {
@@ -12,8 +13,9 @@ List<int> digits = List.generate(9, (index) => index + 1);
 
 class SudokuAnswer extends StatefulWidget {
   final Sudoku sudoku;
+  final int index;
 
-  const SudokuAnswer({super.key, required this.sudoku});
+  const SudokuAnswer({super.key, required this.sudoku, required this.index});
 
   @override
   State<SudokuAnswer> createState() => _SudokuAnswerState();
@@ -105,6 +107,15 @@ class _SudokuAnswerState extends State<SudokuAnswer> {
     return true;
   }
 
+  void saveAnswer(){
+    generateAnswer();
+    widget.sudoku.addedDigits = widget.sudoku.finalAnswer;
+    if(widget.index != 0) {
+      StorageHelper.updateSudoku(widget.sudoku, widget.index);
+    }
+    Navigator.pop(context);
+  }
+
   void generateAnswer() {
     setState(() {
       if (widget.sudoku.finalAnswer != null) {
@@ -120,6 +131,9 @@ class _SudokuAnswerState extends State<SudokuAnswer> {
         if (answer.item1) {
           addedDigitsSudoku = answer.item2;
           widget.sudoku.finalAnswer = answer.item2;
+          if(widget.index != 0) {
+            StorageHelper.updateSudoku(widget.sudoku, widget.index);
+          }
         } else {
           labelText = "Invalid Sudoku, Solution doesn't exists";
           buttonText = "Invalid";
@@ -185,6 +199,18 @@ class _SudokuAnswerState extends State<SudokuAnswer> {
               child: Text(
                 buttonText,
                 style: const TextStyle(fontSize: 30.0),
+              ),
+            ),
+          ),
+          const SizedBox(height: 30.0),
+          SizedBox(
+            width: 400,
+            height: 70,
+            child: ElevatedButton(
+              onPressed: saveAnswer,
+              child: const Text(
+                "Save Solution",
+                style: TextStyle(fontSize: 30.0),
               ),
             ),
           ),

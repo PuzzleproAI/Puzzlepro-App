@@ -18,6 +18,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
+  bool isLoaded = false;
   @override
   void initState() {
     super.initState();
@@ -30,10 +31,17 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   }
 
   fetchSudokuList() async {
+    setState(() {
+      isLoaded = false;
+    });
     var list = await StorageHelper.loadAllSudoku();
     setState(() {
       sudokuList = list;
+      isLoaded = true;
     });
+  }
+  getIsLoaded(){
+    return isLoaded;
   }
 
   Future<void> onRefresh() async {
@@ -46,6 +54,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return SudokuListView(
-        sudokuList: sudokuList, onDelete: deleteSudoku, onRefresh: onRefresh);
+        sudokuList: sudokuList, onDelete: deleteSudoku, onRefresh: onRefresh, getIsLoaded: getIsLoaded,);
   }
 }

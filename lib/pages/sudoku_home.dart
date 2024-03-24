@@ -77,6 +77,7 @@ class _SudokuHomeState extends State<SudokuHome> {
     Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
       return SudokuAnswer(
         sudoku: sudoku,
+        index: widget.index,
       );
     }));
   }
