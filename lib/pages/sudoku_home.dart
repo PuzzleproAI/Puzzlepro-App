@@ -84,7 +84,11 @@ class _SudokuHomeState extends State<SudokuHome> {
 
   showSnackBar() {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Sudoku Saved successfully.'),behavior: SnackBarBehavior.floating,duration: Duration(seconds: 1),),
+      const SnackBar(
+        content: Text('Sudoku Saved successfully.'),
+        behavior: SnackBarBehavior.floating,
+        duration: Duration(seconds: 1),
+      ),
     );
   }
 
@@ -123,21 +127,26 @@ class _SudokuHomeState extends State<SudokuHome> {
     }
     return true;
   }
-  checkAnswerPress(){
-    if(checkAllDigitsAddedHome(sudoku.addedDigits)){
+
+  checkAnswerPress() {
+    if (checkAllDigitsAddedHome(sudoku.addedDigits)) {
       Navigator.push(context,
           MaterialPageRoute(builder: (BuildContext context) {
-            return SudokuAnswerChecker(
-              sudoku: sudoku,
-            );
-          }));
-    }
-    else{
+        return SudokuAnswerChecker(
+          sudoku: sudoku,
+        );
+      }));
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all the digits.'),behavior: SnackBarBehavior.floating,duration: Duration(seconds: 1),),
+        const SnackBar(
+          content: Text('Please fill all the digits.'),
+          behavior: SnackBarBehavior.floating,
+          duration: Duration(seconds: 1),
+        ),
       );
     }
   }
+
   getSudokuStatus() {
     int total = 0, remaining = 0;
     for (int i = 0; i < 9; i++) {
@@ -155,6 +164,7 @@ class _SudokuHomeState extends State<SudokuHome> {
     }
     return ((total - remaining) * 100) ~/ total;
   }
+
   Widget sudokuWidget() {
     return SizedBox(
       width: 350.0,
@@ -164,36 +174,36 @@ class _SudokuHomeState extends State<SudokuHome> {
           color: _colorScheme.background,
         ),
         child: CustomPaint(
-        painter: LinesPainter(_colorScheme),
-        child: GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 9,
-          ),
-          itemCount:
-              sudoku.originalSudoku.length * sudoku.originalSudoku[0].length,
-          itemBuilder: (context, index) {
-            int row = index ~/ 9;
-            int col = index % 9;
-            int originalCellValue = sudoku.originalSudoku[row][col];
-            int addedDigitsCellValue = sudoku.addedDigits![row][col];
+          painter: LinesPainter(_colorScheme),
+          child: GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 9,
+            ),
+            itemCount:
+                sudoku.originalSudoku.length * sudoku.originalSudoku[0].length,
+            itemBuilder: (context, index) {
+              int row = index ~/ 9;
+              int col = index % 9;
+              int originalCellValue = sudoku.originalSudoku[row][col];
+              int addedDigitsCellValue = sudoku.addedDigits![row][col];
 
-            return SudokuCell(
-              originalValue: originalCellValue,
-              addedDigitsValue: addedDigitsCellValue,
-              colorScheme: _colorScheme,
-              isSelected: (currentSelectedCell[0] == row &&
-                  currentSelectedCell[1] == col),
-              onTap: () {
-                setState(() {
-                  currentSelectedCell[0] = row;
-                  currentSelectedCell[1] = col;
-                });
-              },
-            );
-          },
+              return SudokuCell(
+                originalValue: originalCellValue,
+                addedDigitsValue: addedDigitsCellValue,
+                colorScheme: _colorScheme,
+                isSelected: (currentSelectedCell[0] == row &&
+                    currentSelectedCell[1] == col),
+                onTap: () {
+                  setState(() {
+                    currentSelectedCell[0] = row;
+                    currentSelectedCell[1] = col;
+                  });
+                },
+              );
+            },
+          ),
         ),
       ),
-    ),
     );
   }
 
@@ -244,8 +254,9 @@ class _SudokuHomeState extends State<SudokuHome> {
               children: [
                 Expanded(
                   child: Text(
-                    "sudoku ${getSudokuStatus()}% completed",
-                    style: const TextStyle(fontSize: 16.0),
+                    "${getSudokuStatus()}% completed",
+                    style: const TextStyle(
+                        fontSize: 18.0, fontWeight: FontWeight.w600),
                   ),
                 ),
                 ElevatedButton(

@@ -68,7 +68,7 @@ class SudokuContent extends StatefulWidget {
 }
 
 class _SudokuContentState extends State<SudokuContent> {
-  late ColorScheme _colorScheme = Theme.of(context).colorScheme;
+  late final ColorScheme _colorScheme = Theme.of(context).colorScheme;
   late final TextTheme _textTheme = Theme.of(context).textTheme;
 
   Widget get contentSpacer => const SizedBox(

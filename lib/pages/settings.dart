@@ -214,10 +214,18 @@ class _SettingsPageState extends State<SettingsPage> {
                   'Total pending Sudoku: $totalPendingSudoku',
                   style: const TextStyle(fontSize: 17),
                 ),
+
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
                 Text(
                   'Total Solved Sudoku: ${totalSudoku - totalPendingSudoku}',
                   style: const TextStyle(fontSize: 17),
                 )
+
               ],
             ),
             const SizedBox(height: 16),
