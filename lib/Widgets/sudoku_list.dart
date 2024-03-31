@@ -53,14 +53,20 @@ class _SudokuListViewState extends State<SudokuListView> {
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         const begin = Offset(1.0, 0.0);
         const end = Offset.zero;
-        const curve = Curves.ease;
+        const curve = Curves.easeOut;
 
-        var tween =
-            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
-        return SlideTransition(
-          position: animation.drive(tween),
-          child: child,
+        // Adding a fade transition along with the slide transition
+        var fadeTween = Tween<double>(begin: 0.0, end: 1.0);
+        var fadeAnimation = animation.drive(fadeTween);
+
+        return FadeTransition(
+          opacity: fadeAnimation,
+          child: SlideTransition(
+            position: animation.drive(tween),
+            child: child,
+          ),
         );
       },
     );

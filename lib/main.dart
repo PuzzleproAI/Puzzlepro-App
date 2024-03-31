@@ -131,10 +131,20 @@ class _AppState extends State<App> {
           useMaterial3: useMaterial3,
         );
       case ScreenSelected.scanner:
-        return const ImageProcessingPage();
-      case ScreenSelected.generator:
-        return SudokuGeneratorPage(
+        return ImageProcessingPage(
           handleScreenChange: handleScreenChange,
+        );
+      case ScreenSelected.generator:
+        return PopScope(
+          canPop: true,
+          onPopInvoked: (bool didPop) {
+            if(didPop){
+              handleScreenChange(ScreenSelected.home.value, "Home");
+            }
+          },
+          child:SudokuGeneratorPage(
+          handleScreenChange: handleScreenChange,
+        ),
         );
       case ScreenSelected.setting:
         return SettingsPage(

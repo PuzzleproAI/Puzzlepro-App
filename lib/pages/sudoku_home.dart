@@ -73,13 +73,94 @@ class _SudokuHomeState extends State<SudokuHome> {
     }
   }
 
-  void solveSudoku() {
-    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
-      return SudokuAnswer(
+  Route _sudokuCreateAnswerRoute() {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => SudokuAnswer(
         sudoku: sudoku,
         index: widget.index,
-      );
-    }));
+      ),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0);
+        const end = Offset.zero;
+        const curve = Curves.easeOut;
+
+        var tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+        // Adding a fade transition along with the slide transition
+        var fadeTween = Tween<double>(begin: 0.0, end: 1.0);
+        var fadeAnimation = animation.drive(fadeTween);
+
+        return FadeTransition(
+          opacity: fadeAnimation,
+          child: SlideTransition(
+            position: animation.drive(tween),
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
+  Route _sudokuValidationRoute() {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => SudokuValidator(
+        sudoku: sudoku,
+      ),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0);
+        const end = Offset.zero;
+        const curve = Curves.easeOut;
+
+        var tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+        // Adding a fade transition along with the slide transition
+        var fadeTween = Tween<double>(begin: 0.0, end: 1.0);
+        var fadeAnimation = animation.drive(fadeTween);
+
+        return FadeTransition(
+          opacity: fadeAnimation,
+          child: SlideTransition(
+            position: animation.drive(tween),
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
+  Route _sudokuCheckAnswerRoute() {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) =>
+          SudokuAnswerChecker(
+        sudoku: sudoku,
+      ),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0);
+        const end = Offset.zero;
+        const curve = Curves.easeOut;
+
+        var tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+        // Adding a fade transition along with the slide transition
+        var fadeTween = Tween<double>(begin: 0.0, end: 1.0);
+        var fadeAnimation = animation.drive(fadeTween);
+
+        return FadeTransition(
+          opacity: fadeAnimation,
+          child: SlideTransition(
+            position: animation.drive(tween),
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
+  void solveSudoku() {
+    Navigator.push(context, _sudokuCreateAnswerRoute());
   }
 
   showSnackBar() {
@@ -130,12 +211,7 @@ class _SudokuHomeState extends State<SudokuHome> {
 
   checkAnswerPress() {
     if (checkAllDigitsAddedHome(sudoku.addedDigits)) {
-      Navigator.push(context,
-          MaterialPageRoute(builder: (BuildContext context) {
-        return SudokuAnswerChecker(
-          sudoku: sudoku,
-        );
-      }));
+      Navigator.push(context, _sudokuCheckAnswerRoute());
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -316,12 +392,7 @@ class _SudokuHomeState extends State<SudokuHome> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (BuildContext context) {
-                        return SudokuValidator(
-                          sudoku: sudoku,
-                        );
-                      }));
+                      Navigator.push(context, _sudokuValidationRoute());
                     },
                     child: const Icon(Icons.lightbulb_outline_rounded),
                   ),

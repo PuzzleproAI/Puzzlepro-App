@@ -6,7 +6,8 @@ import 'package:flutter/foundation.dart';
 import 'package:puzzlepro_app/pages/upload_image.dart';
 
 class ImageProcessingPage extends StatefulWidget {
-  const ImageProcessingPage({super.key});
+  const ImageProcessingPage({super.key, required this.handleScreenChange});
+  final Function(int, String) handleScreenChange;
 
   @override
   State<ImageProcessingPage> createState() => _ImageProcessingPageState();
@@ -46,7 +47,7 @@ class _ImageProcessingPageState extends State<ImageProcessingPage> {
         children: [
           Padding(
             padding:
-            const EdgeInsets.symmetric(horizontal: kIsWeb ? 24.0 : 16.0),
+                const EdgeInsets.symmetric(horizontal: kIsWeb ? 24.0 : 16.0),
             child: Card(
               elevation: 4.0,
               child: Padding(
@@ -63,14 +64,8 @@ class _ImageProcessingPageState extends State<ImageProcessingPage> {
   }
 
   Widget _image() {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     if (_croppedFile != null) {
       final path = _croppedFile!.path;
       return ConstrainedBox(
@@ -139,77 +134,77 @@ class _ImageProcessingPageState extends State<ImageProcessingPage> {
   Widget _uploaderCard() {
     return Center(
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              const Padding(
-                padding: EdgeInsets.fromLTRB(30.0, 30.0, 30.0, 10.0),
-                child: Text(
-                  'SudokuLens by PuzzlePro Sudoku Recogniser',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 35,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(30.0, 30.0, 30.0, 10.0),
+            child: Text(
+              'SudokuLens by PuzzlePro Sudoku Recogniser',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 35,
+                fontWeight: FontWeight.bold,
               ),
-              const SizedBox(height: 130.0),
-              ElevatedButton.icon(
-                onPressed: () {
-                  _captureImage(context);
-                },
-                icon: const Icon(
-                  Icons.camera_alt,
-                  size: 30,
-                ),
-                label: const Text(
-                  'Capture from Camera',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-                ),
-                style: ElevatedButton.styleFrom(
-                  fixedSize: const Size(330, 80), // Set the button size
-                ),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton.icon(
-                onPressed: () async {
-                  await _pickImageFromGallery(context);
-                },
-                icon: const Icon(
-                  Icons.photo,
-                  size: 30,
-                ),
-                label: const Text(
-                  'Choose Image',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-                ),
-                style: ElevatedButton.styleFrom(
-                  fixedSize: const Size(250, 80), // Set the button size
-                ),
-              ),
-            ],
+            ),
           ),
-        ));
+          const SizedBox(height: 130.0),
+          ElevatedButton.icon(
+            onPressed: () {
+              _captureImage(context);
+            },
+            icon: const Icon(
+              Icons.camera_alt,
+              size: 30,
+            ),
+            label: const Text(
+              'Capture from Camera',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+            ),
+            style: ElevatedButton.styleFrom(
+              fixedSize: const Size(330, 80), // Set the button size
+            ),
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
+            onPressed: () async {
+              await _pickImageFromGallery(context);
+            },
+            icon: const Icon(
+              Icons.photo,
+              size: 30,
+            ),
+            label: const Text(
+              'Choose Image',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+            ),
+            style: ElevatedButton.styleFrom(
+              fixedSize: const Size(250, 80), // Set the button size
+            ),
+          ),
+        ],
+      ),
+    ));
   }
 
   Future<void> _cropImage() async {
     if (_pickedFile != null) {
       final croppedFile = await ImageCropper().cropImage(
-          sourcePath: _pickedFile!.path,
-          compressFormat: ImageCompressFormat.jpg,
-          compressQuality: 100,
-          uiSettings: [
-            AndroidUiSettings(
-                toolbarTitle: 'Crop and Rotate',
-                toolbarColor: _colorScheme.background,
-                toolbarWidgetColor: _colorScheme.primary,
-                dimmedLayerColor: _colorScheme.background.withOpacity(0.8),
-                cropGridColor: _colorScheme.primary,
-                cropFrameColor: _colorScheme.primary,
-                statusBarColor: _colorScheme.background,
-                initAspectRatio: CropAspectRatioPreset.square,
-                lockAspectRatio: false),
-          ],
+        sourcePath: _pickedFile!.path,
+        compressFormat: ImageCompressFormat.jpg,
+        compressQuality: 100,
+        uiSettings: [
+          AndroidUiSettings(
+              toolbarTitle: 'Crop and Rotate',
+              toolbarColor: _colorScheme.background,
+              toolbarWidgetColor: _colorScheme.primary,
+              dimmedLayerColor: _colorScheme.background.withOpacity(0.8),
+              cropGridColor: _colorScheme.primary,
+              cropFrameColor: _colorScheme.primary,
+              statusBarColor: _colorScheme.background,
+              initAspectRatio: CropAspectRatioPreset.square,
+              lockAspectRatio: false),
+        ],
       );
       if (croppedFile != null) {
         setState(() {
@@ -231,7 +226,11 @@ class _ImageProcessingPageState extends State<ImageProcessingPage> {
     } else {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Image picking canceled'),behavior: SnackBarBehavior.floating,duration: Duration(seconds: 1),),
+        const SnackBar(
+          content: Text('Image picking canceled'),
+          behavior: SnackBarBehavior.floating,
+          duration: Duration(seconds: 1),
+        ),
       );
     }
   }
@@ -242,7 +241,6 @@ class _ImageProcessingPageState extends State<ImageProcessingPage> {
       _croppedFile = null;
     });
   }
-
 
   Future<void> _captureImage(BuildContext context) async {
     final picker = ImagePicker();
@@ -256,28 +254,53 @@ class _ImageProcessingPageState extends State<ImageProcessingPage> {
     } else {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Image capture canceled'),behavior: SnackBarBehavior.floating,duration: Duration(seconds: 1),),
+        const SnackBar(
+          content: Text('Image capture canceled'),
+          behavior: SnackBarBehavior.floating,
+          duration: Duration(seconds: 1),
+        ),
       );
     }
   }
 
+  Route _uploadPageRoute(bytes) {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => UploadImagePage(
+        image: bytes,
+        handleScreenChange: widget.handleScreenChange,
+      ),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0);
+        const end = Offset.zero;
+        const curve = Curves.easeOut;
+
+        var tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+        // Adding a fade transition along with the slide transition
+        var fadeTween = Tween<double>(begin: 0.0, end: 1.0);
+        var fadeAnimation = animation.drive(fadeTween);
+
+        return FadeTransition(
+          opacity: fadeAnimation,
+          child: SlideTransition(
+            position: animation.drive(tween),
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
   void _saveAndProceed() async {
-    String imagePath = "some_path";
-    if(_croppedFile == null){
+    String imagePath = "someRandomPath";
+    if (_croppedFile == null) {
       imagePath = _pickedFile!.path;
-    }
-    else{
+    } else {
       imagePath = _croppedFile!.path;
     }
     final bytes = File(imagePath).readAsBytesSync();
-    
-    Navigator.push(context, 
-      MaterialPageRoute(
-      builder: (BuildContext context) {
-      return UploadImagePage(
-        image: bytes,
-      );
-      })
-    );
+
+    Navigator.push(context, _uploadPageRoute(bytes));
   }
 }

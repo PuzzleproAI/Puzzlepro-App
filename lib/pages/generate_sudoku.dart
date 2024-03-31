@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:puzzlepro_app/Data/constants.dart';
 import 'package:puzzlepro_app/Widgets/sudoku_board_widget.dart';
 import 'package:puzzlepro_app/pages/sudoku_home.dart';
 import 'package:puzzlepro_app/services/database.dart';
@@ -170,12 +171,37 @@ class _SudokuGeneratorPageState extends State<SudokuGeneratorPage> {
     );
   }
 
+  Route _sudokuHomeRoute(int key) {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => SudokuHome(
+        index: key,
+      ),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0);
+        const end = Offset.zero;
+        const curve = Curves.easeOut;
+
+        var tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+        // Adding a fade transition along with the slide transition
+        var fadeTween = Tween<double>(begin: 0.0, end: 1.0);
+        var fadeAnimation = animation.drive(fadeTween);
+
+        return FadeTransition(
+          opacity: fadeAnimation,
+          child: SlideTransition(
+            position: animation.drive(tween),
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
   sendToHome(int id) {
-    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
-      return SudokuHome(
-        index: id,
-      );
-    }));
+    widget.handleScreenChange(ScreenSelected.home.value, "Generated");
+    Navigator.push(context, _sudokuHomeRoute(id));
   }
 
   saveButton() async {
