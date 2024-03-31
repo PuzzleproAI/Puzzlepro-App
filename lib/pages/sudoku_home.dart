@@ -73,18 +73,103 @@ class _SudokuHomeState extends State<SudokuHome> {
     }
   }
 
-  void solveSudoku() {
-    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
-      return SudokuAnswer(
+  Route _sudokuCreateAnswerRoute() {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => SudokuAnswer(
         sudoku: sudoku,
         index: widget.index,
-      );
-    }));
+      ),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0);
+        const end = Offset.zero;
+        const curve = Curves.easeOut;
+
+        var tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+        // Adding a fade transition along with the slide transition
+        var fadeTween = Tween<double>(begin: 0.0, end: 1.0);
+        var fadeAnimation = animation.drive(fadeTween);
+
+        return FadeTransition(
+          opacity: fadeAnimation,
+          child: SlideTransition(
+            position: animation.drive(tween),
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
+  Route _sudokuValidationRoute() {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => SudokuValidator(
+        sudoku: sudoku,
+      ),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0);
+        const end = Offset.zero;
+        const curve = Curves.easeOut;
+
+        var tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+        // Adding a fade transition along with the slide transition
+        var fadeTween = Tween<double>(begin: 0.0, end: 1.0);
+        var fadeAnimation = animation.drive(fadeTween);
+
+        return FadeTransition(
+          opacity: fadeAnimation,
+          child: SlideTransition(
+            position: animation.drive(tween),
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
+  Route _sudokuCheckAnswerRoute() {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) =>
+          SudokuAnswerChecker(
+        sudoku: sudoku,
+      ),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0);
+        const end = Offset.zero;
+        const curve = Curves.easeOut;
+
+        var tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+        // Adding a fade transition along with the slide transition
+        var fadeTween = Tween<double>(begin: 0.0, end: 1.0);
+        var fadeAnimation = animation.drive(fadeTween);
+
+        return FadeTransition(
+          opacity: fadeAnimation,
+          child: SlideTransition(
+            position: animation.drive(tween),
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
+  void solveSudoku() {
+    Navigator.push(context, _sudokuCreateAnswerRoute());
   }
 
   showSnackBar() {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Sudoku Saved successfully.'),behavior: SnackBarBehavior.floating,duration: Duration(seconds: 1),),
+      const SnackBar(
+        content: Text('Sudoku Saved successfully.'),
+        behavior: SnackBarBehavior.floating,
+        duration: Duration(seconds: 1),
+      ),
     );
   }
 
@@ -123,21 +208,21 @@ class _SudokuHomeState extends State<SudokuHome> {
     }
     return true;
   }
-  checkAnswerPress(){
-    if(checkAllDigitsAddedHome(sudoku.addedDigits)){
-      Navigator.push(context,
-          MaterialPageRoute(builder: (BuildContext context) {
-            return SudokuAnswerChecker(
-              sudoku: sudoku,
-            );
-          }));
-    }
-    else{
+
+  checkAnswerPress() {
+    if (checkAllDigitsAddedHome(sudoku.addedDigits)) {
+      Navigator.push(context, _sudokuCheckAnswerRoute());
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all the digits.'),behavior: SnackBarBehavior.floating,duration: Duration(seconds: 1),),
+        const SnackBar(
+          content: Text('Please fill all the digits.'),
+          behavior: SnackBarBehavior.floating,
+          duration: Duration(seconds: 1),
+        ),
       );
     }
   }
+
   getSudokuStatus() {
     int total = 0, remaining = 0;
     for (int i = 0; i < 9; i++) {
@@ -155,6 +240,7 @@ class _SudokuHomeState extends State<SudokuHome> {
     }
     return ((total - remaining) * 100) ~/ total;
   }
+
   Widget sudokuWidget() {
     return SizedBox(
       width: 350.0,
@@ -164,36 +250,36 @@ class _SudokuHomeState extends State<SudokuHome> {
           color: _colorScheme.background,
         ),
         child: CustomPaint(
-        painter: LinesPainter(_colorScheme),
-        child: GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 9,
-          ),
-          itemCount:
-              sudoku.originalSudoku.length * sudoku.originalSudoku[0].length,
-          itemBuilder: (context, index) {
-            int row = index ~/ 9;
-            int col = index % 9;
-            int originalCellValue = sudoku.originalSudoku[row][col];
-            int addedDigitsCellValue = sudoku.addedDigits![row][col];
+          painter: LinesPainter(_colorScheme),
+          child: GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 9,
+            ),
+            itemCount:
+                sudoku.originalSudoku.length * sudoku.originalSudoku[0].length,
+            itemBuilder: (context, index) {
+              int row = index ~/ 9;
+              int col = index % 9;
+              int originalCellValue = sudoku.originalSudoku[row][col];
+              int addedDigitsCellValue = sudoku.addedDigits![row][col];
 
-            return SudokuCell(
-              originalValue: originalCellValue,
-              addedDigitsValue: addedDigitsCellValue,
-              colorScheme: _colorScheme,
-              isSelected: (currentSelectedCell[0] == row &&
-                  currentSelectedCell[1] == col),
-              onTap: () {
-                setState(() {
-                  currentSelectedCell[0] = row;
-                  currentSelectedCell[1] = col;
-                });
-              },
-            );
-          },
+              return SudokuCell(
+                originalValue: originalCellValue,
+                addedDigitsValue: addedDigitsCellValue,
+                colorScheme: _colorScheme,
+                isSelected: (currentSelectedCell[0] == row &&
+                    currentSelectedCell[1] == col),
+                onTap: () {
+                  setState(() {
+                    currentSelectedCell[0] = row;
+                    currentSelectedCell[1] = col;
+                  });
+                },
+              );
+            },
+          ),
         ),
       ),
-    ),
     );
   }
 
@@ -244,8 +330,9 @@ class _SudokuHomeState extends State<SudokuHome> {
               children: [
                 Expanded(
                   child: Text(
-                    "sudoku ${getSudokuStatus()}% completed",
-                    style: const TextStyle(fontSize: 16.0),
+                    "${getSudokuStatus()}% completed",
+                    style: const TextStyle(
+                        fontSize: 18.0, fontWeight: FontWeight.w600),
                   ),
                 ),
                 ElevatedButton(
@@ -305,12 +392,7 @@ class _SudokuHomeState extends State<SudokuHome> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (BuildContext context) {
-                        return SudokuValidator(
-                          sudoku: sudoku,
-                        );
-                      }));
+                      Navigator.push(context, _sudokuValidationRoute());
                     },
                     child: const Icon(Icons.lightbulb_outline_rounded),
                   ),

@@ -179,26 +179,6 @@ class _SudokuAnswerCheckerState extends State<SudokuAnswerChecker> {
             fontSize: 30.0,
           ),
         ),
-        actions: [
-          PopupMenuButton<String>(
-            onSelected: (value) {
-              if (value == "share") {
-              } else if (value == "delete") {}
-            },
-            itemBuilder: (BuildContext context) {
-              return [
-                const PopupMenuItem<String>(
-                  value: "share",
-                  child: Text("Share"),
-                ),
-                const PopupMenuItem<String>(
-                  value: "delete",
-                  child: Text("Delete"),
-                ),
-              ];
-            },
-          ),
-        ],
       ),
       body: Center(
           child: Column(

@@ -45,6 +45,33 @@ class _SudokuListViewState extends State<SudokuListView> {
     }
   }
 
+  Route _sudokuHomeRoute(int key) {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => SudokuHome(
+        index: key,
+      ),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0);
+        const end = Offset.zero;
+        const curve = Curves.easeOut;
+
+        var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+        // Adding a fade transition along with the slide transition
+        var fadeTween = Tween<double>(begin: 0.0, end: 1.0);
+        var fadeAnimation = animation.drive(fadeTween);
+
+        return FadeTransition(
+          opacity: fadeAnimation,
+          child: SlideTransition(
+            position: animation.drive(tween),
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -108,12 +135,8 @@ class _SudokuListViewState extends State<SudokuListView> {
                                     getFilteredItems()[key] ?? Sudoku.empty(),
                                 listIndex: index,
                                 onSelected: () => {
-                                  Navigator.push(context, MaterialPageRoute(
-                                      builder: (BuildContext context) {
-                                    return SudokuHome(
-                                      index: key,
-                                    );
-                                  })).then((value) => {widget.onRefresh()})
+                                  Navigator.push(context, _sudokuHomeRoute(key))
+                                      .then((value) => {widget.onRefresh()})
                                 },
                                 key: widget.key,
                                 onDelete: () => {

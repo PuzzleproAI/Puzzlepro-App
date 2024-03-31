@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:puzzlepro_app/Data/constants.dart';
@@ -130,10 +131,20 @@ class _AppState extends State<App> {
           useMaterial3: useMaterial3,
         );
       case ScreenSelected.scanner:
-        return const ImageProcessingPage();
-      case ScreenSelected.generator:
-        return SudokuGeneratorPage(
+        return ImageProcessingPage(
           handleScreenChange: handleScreenChange,
+        );
+      case ScreenSelected.generator:
+        return PopScope(
+          canPop: true,
+          onPopInvoked: (bool didPop) {
+            if(didPop){
+              handleScreenChange(ScreenSelected.home.value, "Home");
+            }
+          },
+          child:SudokuGeneratorPage(
+          handleScreenChange: handleScreenChange,
+        ),
         );
       case ScreenSelected.setting:
         return SettingsPage(
@@ -236,9 +247,22 @@ class _AppState extends State<App> {
                   ),
                 ),
               ),
-              // body: const SudokuHome(),
-              body: getScreen(ScreenSelected.values[screenIndex]),
-              // body: const ScanOptionsPage(),
+              body: PageTransitionSwitcher(
+                duration: const Duration(milliseconds: 400),
+                transitionBuilder: (
+                    Widget child,
+                    Animation<double> animation,
+                    Animation<double> secondaryAnimation,
+                    ) {
+                  return FadeThroughTransition(
+                    animation: animation,
+                    secondaryAnimation: secondaryAnimation,
+                    fillColor: Colors.transparent,
+                    child: child,
+                  );
+                },
+                child: getScreen(ScreenSelected.values[screenIndex]),
+              ),
               bottomNavigationBar: NavigationBar(
                 onDestinationSelected: (int index) {
                   setState(() {
