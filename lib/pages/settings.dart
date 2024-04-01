@@ -113,6 +113,8 @@ class _SettingsPageState extends State<SettingsPage> {
                           themeValue = 1;
                         } else if (newValue == 'Dark Mode') {
                           themeValue = 2;
+                        } else if(newValue == "System Mode"){
+                          themeValue = 0;
                         }
                         widget.changeTheme(themeValue);
                         saveTheme(themeValue);
