@@ -1,5 +1,6 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:provider/provider.dart';
 import 'package:puzzlepro_app/Data/constants.dart';
 import 'package:puzzlepro_app/models/theme_data.dart';
@@ -22,7 +23,8 @@ setThemeFromStorage() async {
 }
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   await StorageHelper.initializeHive();
   var themeModeValues = await setThemeFromStorage();
   runApp(ChangeNotifierProvider(
@@ -61,6 +63,7 @@ class _AppState extends State<App> {
       themeMode = widget.themeValues.getTheme();
       colorSelected = widget.themeValues.colorSelected;
     });
+    FlutterNativeSplash.remove();
     super.initState();
   }
 

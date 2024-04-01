@@ -227,7 +227,7 @@ class _ImageProcessingPageState extends State<ImageProcessingPage> {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Image picking canceled'),
+          content: Text('Image picking cancelled'),
           behavior: SnackBarBehavior.floating,
           duration: Duration(seconds: 1),
         ),
@@ -255,7 +255,7 @@ class _ImageProcessingPageState extends State<ImageProcessingPage> {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Image capture canceled'),
+          content: Text('Image capture cancelled'),
           behavior: SnackBarBehavior.floating,
           duration: Duration(seconds: 1),
         ),
